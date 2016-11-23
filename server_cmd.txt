@@ -1,0 +1,70 @@
+This file describe features of the TCP daemon : musicbotd
+Server default port : 1937 (randomly choose by Pierre Guinault)
+
+Description of TCP commands of musicbot server.
+
+	add (<id>|<url>)
+
+		Add a video ID or URL of youtube video in the playlist
+		Display: the name of the added video.
+		ex:
+			add https://www.youtube.com/watch?v=OOwXc65Q5qM
+			add WUHi0pEnNtg
+
+	del (<index>|<id>)
+
+		Remove a video by ID or index of youtube video in the playlist
+		Index is the position of video in the playlist.
+		Display: the name of the removed video.
+		ex:
+			del WUHi0pEnNtg
+
+
+	next
+
+		Pass to the next music.
+		Display: the name of the next video.
+
+
+	prev
+
+		Come back to the previous music.
+		Display: the name of the previous video.
+
+
+	vol <value>
+
+		Increment the volume with the corresponding <value>.
+		The value is a signed integer in percent.
+		Display: the current volume level (between 0 and 100%).
+		ex:
+			vol 5
+			vol -15
+
+	pause
+
+		Pause the current music.
+		Display: a confirmation message.
+
+
+	list [<N>]
+
+		List the <N> next videos. If the parameter is ommitted, all the
+		playlist is displayed.
+		Display: the list of all video in the playlist, each video is
+		showed with its video ID and its name.
+
+	
+	random
+		
+		Select randomly a music in archive file.
+		Display: the name of the next video.
+
+
+	clear
+	
+		Remove all the playlist.
+		Display: a confirmation message.
+
+Everytime the server change to the next music, the name will be displayed
+on the TCP socket.
