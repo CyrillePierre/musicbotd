@@ -18,7 +18,7 @@ namespace net
 class Client
 {
 	int _fd;	// Le file descriptor de la socket
-    std::mutex _mutex;
+    mutable std::mutex _mutex;
 
 public:
 	/** @brief Constructeur */

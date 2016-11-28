@@ -11,8 +11,8 @@ class CmdParser {
 
 public:
     CmdParser(Player & player) : _player{player} {}
-    void apply(std::string const & cmd);
+    std::string apply(std::string const & cmd);
 
 private:
-    void add(std::istringstream & iss);
+    std::string add(std::istringstream & iss);
 };

@@ -5,7 +5,7 @@
 
 void printList(Player::PlayListView && list) {
     for (auto & it : list)
-        std::cout << "  - (" << it->id << ") " << it->name << std::endl;
+        std::cout << "  - (" << it->id() << ") " << it->title() << std::endl;
 }
 
 int main() {
@@ -21,7 +21,11 @@ int main() {
             buf[nbRead - 1] = 0;
             std::cout << "[Client] " << buf << std::endl;
             std::string line(buf, nbRead);
-            parser.apply(line);
+            std::string res{parser.apply(line)};
+            if (!res.empty()) {
+                res.push_back('\n');
+                client.write(res.c_str(), res.size());
+            }
             printList(player.list());
         }
     });

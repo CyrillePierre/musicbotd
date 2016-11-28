@@ -4,16 +4,16 @@
 
 void Player::remove(std::string const & id) {
     Playlist::iterator it = std::find_if(_playlist.begin(), _playlist.end(),
-        [&id] (Music const & m) { return m.id == id; });
+        [&id] (WebMusic const & m) { return m.id() == id; });
     if (it != _playlist.end()) _playlist.erase(it);
 }
 
 void Player::add(std::string const & id, std::string const & name) {
     Lock lock{_mutex};
-    _playlist.push_back(Music{id, name});
+    _playlist.push_back(WebMusic{id, name});
 }
 
-void Player::add(const Music &m) {
+void Player::add(const WebMusic &m) {
     Lock lock{_mutex};
     _playlist.push_back(m);
 }
