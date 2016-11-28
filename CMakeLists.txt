@@ -5,16 +5,26 @@ project(musicbotd)
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall ${CMAKE_CXX_FLAGS}")
 	endif()
 else()
 	set(CMAKE_CXX_STANDARD 11)
 endif()
 
+
+set(CMAKE_MODULE_PATH cmake)
+set(CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib/x86_64-linux-gnu/)
+find_package(CURL REQUIRED)
+
+
 #set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 file(GLOB_RECURSE source_files src/*.cpp)
 add_executable(${PROJECT_NAME} ${source_files})
-target_link_libraries(${PROJECT_NAME} pthread -static-libstdc++)
+target_link_libraries(${PROJECT_NAME}
+	${CURL_LIBRARIES}
+	pthread
+	-static-libstdc++
+)
 
 # génération des exécutables pour les programmes de test
 #file(GLOB test_sources test/src/*.cpp)
@@ -27,5 +37,5 @@ target_link_libraries(${PROJECT_NAME} pthread -static-libstdc++)
 #endforeach(test_source ${test_sources})
 
 # Pour QtCreator (affichage des headers dans l'arborescence)
-file(GLOB_RECURSE headers_lib *.h *.hpp *.hxx)
+file(GLOB_RECURSE headers_lib *.h *.hpp *.hxx cmake/*)
 add_custom_target(headers SOURCES ${headers_lib})

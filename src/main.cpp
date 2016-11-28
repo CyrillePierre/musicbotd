@@ -5,7 +5,7 @@
 
 void printList(Player::PlayListView && list) {
     for (auto & it : list)
-        std::cout << "[" << it->id << "] " << it->name << std::endl;
+        std::cout << "  - (" << it->id << ") " << it->name << std::endl;
 }
 
 int main() {

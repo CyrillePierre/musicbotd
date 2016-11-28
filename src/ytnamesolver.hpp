@@ -1,7 +1,24 @@
 #pragma once
 
-struct YtNameSolver {
-    static void init();
-    static void dispose();
-    static std::string getName(std::string url);
+#include <sstream>
+#include <regex>
+#include <curl/curl.h>
+
+class YtNameSolver {
+    static std::regex const _reTitle;
+
+    CURL * _curl;
+    char _errorBuf[CURL_ERROR_SIZE];
+    std::ostringstream _oss;
+
+public:
+    YtNameSolver();
+    ~YtNameSolver();
+    std::string getVideoTitle(std::string url);
+
+private:
+    static size_t writeData(void   * data,
+                            size_t   size,
+                            size_t   nmemb,
+                            void   * ptr);
 };
