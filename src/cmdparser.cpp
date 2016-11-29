@@ -12,9 +12,10 @@ std::string CmdParser::apply(std::string const & line) {
 
     iss >> cmd;
 
-    if (cmd == "add")  return add(iss);
-    if (cmd == "list") return list(iss);
-    if (cmd == "rm")   return rm(iss);
+    if (cmd == "add")   return add(iss);
+    if (cmd == "list")  return list(iss);
+    if (cmd == "rm")    return rm(iss);
+    if (cmd == "clear") return clear(iss);
     return "";
 }
 
@@ -60,4 +61,9 @@ std::string CmdParser::rm(std::istringstream & iss) {
         }
     }
     return "Remove failed.\n";
+}
+
+std::string CmdParser::clear(std::istringstream &) {
+    _player.clear();
+    return "Playlist cleared.\n";
 }

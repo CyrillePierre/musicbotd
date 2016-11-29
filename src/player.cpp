@@ -3,20 +3,20 @@
 #include "player.hpp"
 
 void Player::add(std::string const & id, std::string const & name) {
-    _plv.clear();
     Lock lock{_mutex};
+    _plv.clear();
     _playlist.push_back(WebMusic{id, name});
 }
 
 void Player::add(const WebMusic &m) {
-    _plv.clear();
     Lock lock{_mutex};
+    _plv.clear();
     _playlist.push_back(m);
 }
 
 void Player::remove(Playlist::const_iterator it) {
-    _plv.clear();
     Lock lock{_mutex};
+    _plv.clear();
     _playlist.erase(it);
 }
 
@@ -25,10 +25,10 @@ util::Optional<WebMusic> Player::remove(std::string const & id) {
         [&id] (WebMusic const & m) { return m.id() == id; });
 
     if (it != _playlist.end()) {
-        _plv.clear();
         auto music = util::makeOptional(std::move(*it));
 
         Lock lock{_mutex};
+        _plv.clear();
         _playlist.erase(it);
         return music;
     }
@@ -39,13 +39,19 @@ util::Optional<WebMusic> Player::remove(std::size_t index) {
     if (index < _plv.size()) {
         Playlist::const_iterator it = _plv[index];
         auto music = util::makeOptional(std::move(*it));
-        _plv.clear();
 
         Lock lock{_mutex};
+        _plv.clear();
         _playlist.erase(it);
         return music;
     }
     return util::Optional<WebMusic>{};
+}
+
+void Player::clear() {
+    Lock lock{_mutex};
+    _plv.clear();
+    _playlist.clear();
 }
 
 void Player::start() {
@@ -64,6 +70,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
 }
 
 Player::PlayListView const & Player::list() const {
+    Lock lock{_mutex};
     _plv.clear();
     _plv.reserve(_playlist.size());
     for (auto it = _playlist.cbegin(); it != _playlist.cend(); ++it)

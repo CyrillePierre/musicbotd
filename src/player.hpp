@@ -33,6 +33,7 @@ public:
     void remove(Playlist::const_iterator it);
     util::Optional<WebMusic> remove(std::string const & id);
     util::Optional<WebMusic> remove(std::size_t index);
+    void clear();
     void start();
     void stop();
     void togglePause();
