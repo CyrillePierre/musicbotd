@@ -3,31 +3,49 @@
 #include "player.hpp"
 
 void Player::add(std::string const & id, std::string const & name) {
+    _plv.clear();
     Lock lock{_mutex};
     _playlist.push_back(WebMusic{id, name});
 }
 
 void Player::add(const WebMusic &m) {
+    _plv.clear();
     Lock lock{_mutex};
     _playlist.push_back(m);
 }
 
 void Player::remove(Playlist::const_iterator it) {
+    _plv.clear();
     Lock lock{_mutex};
     _playlist.erase(it);
 }
 
-void Player::remove(std::string const & id) {
+util::Optional<WebMusic> Player::remove(std::string const & id) {
     Playlist::iterator it = std::find_if(_playlist.begin(), _playlist.end(),
         [&id] (WebMusic const & m) { return m.id() == id; });
-    if (it != _playlist.end()) _playlist.erase(it);
+
+    if (it != _playlist.end()) {
+        _plv.clear();
+        auto music = util::makeOptional(std::move(*it));
+
+        Lock lock{_mutex};
+        _playlist.erase(it);
+        return music;
+    }
+    return util::Optional<WebMusic>{};
 }
 
-void Player::remove(std::size_t index) {
+util::Optional<WebMusic> Player::remove(std::size_t index) {
     if (index < _plv.size()) {
+        Playlist::const_iterator it = _plv[index];
+        auto music = util::makeOptional(std::move(*it));
+        _plv.clear();
+
         Lock lock{_mutex};
-        _playlist.erase(_plv[index]);
+        _playlist.erase(it);
+        return music;
     }
+    return util::Optional<WebMusic>{};
 }
 
 void Player::start() {

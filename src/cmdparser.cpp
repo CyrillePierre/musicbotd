@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <cstdlib>
 #include "cmdparser.hpp"
 #include "player.hpp"
 #include "ytnamesolver.hpp"
@@ -10,10 +11,10 @@ std::string CmdParser::apply(std::string const & line) {
     std::string cmd;
 
     iss >> cmd;
-//    if (!cmd.back()) cmd.pop_back();
 
-    if (cmd == "add") return add(iss);
+    if (cmd == "add")  return add(iss);
     if (cmd == "list") return list(iss);
+    if (cmd == "rm")   return rm(iss);
     return "";
 }
 
@@ -42,4 +43,29 @@ std::string CmdParser::list(std::istringstream &) {
         oss << "] " << it->title() << std::endl;
     }
     return oss.str();
+}
+
+std::string CmdParser::rm(std::istringstream & iss) {
+    std::string id;
+    if (iss >> id) {
+        char * end;
+        std::size_t index = std::strtoul(id.c_str(), &end, 10);
+
+        std::cout << "id    = {" << id << '}' << std::endl;
+        std::cout << "end   = {" << end << '}' << std::endl;
+        std::cout << "*end  = " << (int) *end << std::endl;
+        std::cout << "index = " << index << std::endl;
+
+        if (!*end) {
+            auto wm = _player.remove(index);
+            if (wm) return "Removing: " + wm->title() + "\n";
+            std::cout << "remove index -> failed" << std::endl;
+        }
+        else if (id.size() == cfg::ytIdSize){
+            auto wm = _player.remove(id);
+            if (wm) return "Removing: " + wm->title() + "\n";
+            std::cout << "remove id -> failed" << std::endl;
+        }
+    }
+    return "Remove failed.\n";
 }

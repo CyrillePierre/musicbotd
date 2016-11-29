@@ -6,6 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "webmusic.hpp"
+#include "util/optional.hpp"
 
 /**
  * This class allows to execute a player to play music with a playlist of URLs.
@@ -30,8 +31,8 @@ public:
     void add(std::string const & id, std::string const & name);
     void add(WebMusic const & m);
     void remove(Playlist::const_iterator it);
-    void remove(std::string const & id);
-    void remove(std::size_t index);
+    util::Optional<WebMusic> remove(std::string const & id);
+    util::Optional<WebMusic> remove(std::size_t index);
     void start();
     void stop();
     void togglePause();

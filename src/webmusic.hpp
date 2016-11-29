@@ -7,6 +7,9 @@ class WebMusic {
     std::string _title;
 
 public:
+    WebMusic() {}
+    WebMusic(WebMusic &&) = default;
+    WebMusic(WebMusic const &) = default;
     WebMusic(std::string const & id, std::string const & title)
         : _id{id}, _title{title} {}
 

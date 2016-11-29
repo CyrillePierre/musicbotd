@@ -11,13 +11,14 @@ Description of TCP commands of musicbot server.
 			add https://www.youtube.com/watch?v=OOwXc65Q5qM
 			add WUHi0pEnNtg
 
-	del (<index>|<id>)
+	rm (<index>|<id>)
 
 		Remove a video by ID or index of youtube video in the playlist
-		Index is the position of video in the playlist.
+		Index is the position of video in the playlist. This method
+		need a call to 'list' before execution.
 		Display: the name of the removed video.
 		ex:
-			del WUHi0pEnNtg
+			rm WUHi0pEnNtg
 
 
 	next
