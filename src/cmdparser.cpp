@@ -50,21 +50,13 @@ std::string CmdParser::rm(std::istringstream & iss) {
     if (iss >> id) {
         char * end;
         std::size_t index = std::strtoul(id.c_str(), &end, 10);
-
-        std::cout << "id    = {" << id << '}' << std::endl;
-        std::cout << "end   = {" << end << '}' << std::endl;
-        std::cout << "*end  = " << (int) *end << std::endl;
-        std::cout << "index = " << index << std::endl;
-
         if (!*end) {
             auto wm = _player.remove(index);
             if (wm) return "Removing: " + wm->title() + "\n";
-            std::cout << "remove index -> failed" << std::endl;
         }
         else if (id.size() == cfg::ytIdSize){
             auto wm = _player.remove(id);
             if (wm) return "Removing: " + wm->title() + "\n";
-            std::cout << "remove id -> failed" << std::endl;
         }
     }
     return "Remove failed.\n";

@@ -58,7 +58,7 @@ Description of TCP commands of musicbot server.
 	
 	random
 		
-		Select randomly a music in archive file.
+		Randomly select a music in archive file.
 		Display: the name of the next video.
 
 
