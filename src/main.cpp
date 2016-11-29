@@ -3,7 +3,7 @@
 #include "player.hpp"
 #include "cmdparser.hpp"
 
-void printList(Player::PlayListView && list) {
+void printList(Player::PlayListView const & list) {
     for (auto & it : list)
         std::cout << "  - (" << it->id() << ") " << it->title() << std::endl;
 }
@@ -18,15 +18,16 @@ int main() {
         CmdParser parser{player};
 
         while (std::size_t nbRead = client.read(buf, 128)) {
-            buf[nbRead - 1] = 0;
-            std::cout << "[Client] " << buf << std::endl;
-            std::string line(buf, nbRead);
-            std::string res{parser.apply(line)};
-            if (!res.empty()) {
-                res.push_back('\n');
-                client.write(res.c_str(), res.size());
+            try {
+                buf[--nbRead] = 0;
+                std::string line(buf);
+                std::cout << "[Client] " << line << std::endl;
+                std::string res{parser.apply(line)};
+                if (!res.empty()) client.write(res.c_str(), res.size());
             }
-            printList(player.list());
+            catch (std::exception const & e) {
+                std::cerr << e.what() << std::endl;
+            }
         }
     });
 

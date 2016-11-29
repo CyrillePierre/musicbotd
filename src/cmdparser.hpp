@@ -15,4 +15,5 @@ public:
 
 private:
     std::string add(std::istringstream & iss);
+    std::string list(std::istringstream & iss);
 };

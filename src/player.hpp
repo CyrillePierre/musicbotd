@@ -22,6 +22,7 @@ private:
     bool                    _started;
     mutable std::mutex      _mutex;
     std::condition_variable _cv;
+    mutable PlayListView	_plv;
 
 public:
     Player() : _pause{false}, _started{false} {}
@@ -30,12 +31,13 @@ public:
     void add(WebMusic const & m);
     void remove(Playlist::const_iterator it);
     void remove(std::string const & id);
+    void remove(std::size_t index);
     void start();
     void stop();
     void togglePause();
     bool isPaused() const { return _pause; }
     Volume incrVolume(Volume v);
-    PlayListView list() const;
+    PlayListView const & list() const;
     std::size_t playlistSize() const;
 
 private:
