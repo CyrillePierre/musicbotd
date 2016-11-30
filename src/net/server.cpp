@@ -35,7 +35,9 @@ void net::Server::connect()
 
 void net::Server::disconnect()
 {
+    for (Client const & c : _clients) c.close();
 	close(_fd);
+    _clients.clear();
 }
 
 /**

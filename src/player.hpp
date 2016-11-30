@@ -40,6 +40,7 @@ public:
     bool isPaused() const { return _pause; }
     Volume incrVolume(Volume v);
     PlayListView const & list() const;
+    PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;
 
 private:

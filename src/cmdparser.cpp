@@ -23,6 +23,9 @@ std::string CmdParser::add(std::istringstream & iss) {
     std::string id;
     iss >> id;
 
+    if (id.size() < cfg::ytIdSize)
+        return "Invalid video ID : '" + id + "'\n";
+
     try {
         id = id.substr(id.size() - cfg::ytIdSize);
         std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
@@ -34,12 +37,17 @@ std::string CmdParser::add(std::istringstream & iss) {
     }
 }
 
-std::string CmdParser::list(std::istringstream &) {
+std::string CmdParser::list(std::istringstream & iss) {
+    std::size_t nbLines;
+    Player::PlayListView const * plv;
+    if (iss >> nbLines) plv = &_player.list(nbLines);
+    else plv = &_player.list();
+
     std::ostringstream oss;
     oss << "Actual playlist:" << std::endl;
 
     int i = 0;
-    for (auto const & it : _player.list()) {
+    for (auto const & it : *plv) {
         oss << std::setw(3) << i++ << ". [" << it->id();
         oss << "] " << it->title() << std::endl;
     }

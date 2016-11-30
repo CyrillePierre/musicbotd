@@ -3,17 +3,12 @@
 #include "player.hpp"
 #include "cmdparser.hpp"
 
-void printList(Player::PlayListView const & list) {
-    for (auto & it : list)
-        std::cout << "  - (" << it->id() << ") " << it->title() << std::endl;
-}
-
 int main() {
     Player player;
 
     net::Server server{1337};
     server.connect();
-    server.asyncAcceptLoop([&player] (net::Client const & client) {
+    server.asyncAcceptLoop([&player, &server] (net::Client const & client) {
         char buf[128];
         CmdParser parser{player};
 
@@ -23,7 +18,7 @@ int main() {
                 std::string line(buf);
                 std::cout << "[Client] " << line << std::endl;
                 std::string res{parser.apply(line)};
-                if (!res.empty()) client.write(res.c_str(), res.size());
+                if (!res.empty()) server.writeAll(res.c_str(), res.size());
             }
             catch (std::exception const & e) {
                 std::cerr << e.what() << std::endl;

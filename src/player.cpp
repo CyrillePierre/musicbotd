@@ -70,10 +70,17 @@ Player::Volume Player::incrVolume(Player::Volume v) {
 }
 
 Player::PlayListView const & Player::list() const {
+    return list(_playlist.size());
+}
+
+Player::PlayListView const & Player::list(std::size_t nbLines) const {
     Lock lock{_mutex};
     _plv.clear();
     _plv.reserve(_playlist.size());
-    for (auto it = _playlist.cbegin(); it != _playlist.cend(); ++it)
+
+    std::size_t i = 0;
+    auto it = _playlist.cbegin();
+    for (; i < nbLines && it != _playlist.cend(); ++it, ++i)
         _plv.push_back(it);
     return _plv;
 }

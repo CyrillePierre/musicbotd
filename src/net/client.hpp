@@ -7,16 +7,14 @@
 #include <mutex>
 #include <unistd.h>
 
-namespace net
-{
+namespace net {
 
 /**
  * Cette classe s'occupe de la gestion de chaque client qui se connecte
  * au serveur.
  * @author Cyrille Pierre
  */
-class Client
-{
+class Client {
 	int _fd;	// Le file descriptor de la socket
     mutable std::mutex _mutex;
 
