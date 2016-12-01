@@ -26,8 +26,11 @@ int main() {
         }
     });
 
+    player.start();
+
     std::cin.get();
     server.disconnect();
+    player.stop();
 
     return 0;
 }

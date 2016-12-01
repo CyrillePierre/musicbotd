@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include "webmusic.hpp"
 #include "util/optional.hpp"
+#include "mpv/client.h"
 
 /**
  * This class allows to execute a player to play music with a playlist of URLs.
@@ -24,9 +25,11 @@ private:
     mutable std::mutex      _mutex;
     std::condition_variable _cv;
     mutable PlayListView	_plv;
+    mpv_handle *			_mpv;
 
 public:
-    Player() : _pause{false}, _started{false} {}
+    Player();
+    ~Player();
 
     void add(std::string const & id, std::string const & name);
     void add(WebMusic const & m);
@@ -45,4 +48,6 @@ public:
 
 private:
     void run();
+    void checkError(int status) const;
+    void playNext();
 };
