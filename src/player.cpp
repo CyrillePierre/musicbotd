@@ -8,7 +8,19 @@
 Player::Player() : _pause{false}, _started{false} {
     _mpv = mpv_create();
     if (!_mpv) std::runtime_error("libmpv: create context failed");
+
+    int opt = 1;
+    checkError(mpv_set_property(_mpv, "ytdl", MPV_FORMAT_FLAG, &opt));
+    opt = 0;
+    checkError(mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt));
     checkError(mpv_initialize(_mpv));
+
+    std::cout << "mpv options:\n"
+              <<   "  - ytdl   = " << mpv_get_property_string(_mpv, "ytdl")
+              << "\n  - video  = " << mpv_get_property_string(_mpv, "video")
+              << "\n  - volume = " << mpv_get_property_string(_mpv, "volume")
+              << std::endl;
+
 }
 
 Player::~Player() {
