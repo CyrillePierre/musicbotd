@@ -5,8 +5,8 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
+#include <util/optional.hpp>
 #include "webmusic.hpp"
-#include "util/optional.hpp"
 #include "mpv/client.h"
 
 /**

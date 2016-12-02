@@ -1,5 +1,5 @@
 #include <iostream>
-#include "net/server.hpp"
+#include <net/server.hpp>
 #include "player.hpp"
 #include "cmdparser.hpp"
 
