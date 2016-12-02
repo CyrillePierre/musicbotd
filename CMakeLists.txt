@@ -11,12 +11,14 @@ else()
 	set(CMAKE_CXX_STANDARD 14)
 endif()
 
-
 set(CMAKE_MODULE_PATH cmake)
 set(CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib/x86_64-linux-gnu/)
 find_package(CURL REQUIRED)
-find_package(Boost 1.62.0 COMPONENTS log)
 
+
+set(LIBS_INCLUDE_DIR lib)
+file(GLOB_RECURSE log_sources lib/log/*.cpp)
+add_library(log ${log_sources})
 
 #set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 file(GLOB_RECURSE source_files src/*.cpp)
@@ -30,12 +32,11 @@ target_link_libraries(${PROJECT_NAME}
 
 # génération des exécutables pour les programmes de test
 file(GLOB test_sources test/*.cpp)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 foreach(test_source ${test_sources})
     get_filename_component(test_exec ${test_source} NAME_WE)
     add_executable(${test_exec} ${test_source})
-    target_link_libraries(${test_exec} ${Boost_LIBRARIES})
-    target_include_directories(${test_exec} PRIVATE src)
+    target_link_libraries(${test_exec} log)
+    target_include_directories(${test_exec} PRIVATE src ${LIBS_INCLUDE_DIR})
 endforeach(test_source ${test_sources})
 
 # Pour QtCreator (affichage des headers dans l'arborescence)

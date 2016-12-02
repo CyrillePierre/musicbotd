@@ -1,7 +1,5 @@
 #include <iostream>
-#include <util/log.hpp>
-
-namespace log =  util::log;
+#include <log/log.hpp>
 
 void test() {
     log::Logger l;
@@ -15,7 +13,7 @@ int main() {
 //    log::format() << log::item::time << log::item::msg;
 
     log::cfg().timeEnabled(true);
-    log::cfg().logLevel(log::msg);
+//    log::cfg().logLevel(log::msg);
 
     log::Logger logger;
     logger.prefix("main(): ");
