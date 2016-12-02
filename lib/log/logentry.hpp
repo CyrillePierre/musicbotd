@@ -6,13 +6,14 @@ namespace log {
 
 class Logger;
 
-struct LogEntry {
-    Logger * logger;
-    int      lvl;
+class LogEntry {
+    bool _token;
+public:
+    int  lvl;
 
-    LogEntry(Logger * l, int lvl) : logger{l}, lvl{lvl} {}
-    LogEntry(LogEntry && le) : logger{le.logger}, lvl{le.lvl}
-    { le.logger = nullptr; }
+    LogEntry(int lvl) : _token{true}, lvl{lvl} {}
+    LogEntry(LogEntry && le) : _token{le._token}, lvl{le.lvl}
+    { le._token = false; }
     ~LogEntry();
 };
 

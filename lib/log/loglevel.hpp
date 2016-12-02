@@ -11,8 +11,8 @@ enum LogLevel {
     crit
 };
 
-constexpr std::array<char const *, 5> levels {
-    "trace"
+constexpr std::array<char const *, 6> levels {
+    "trace",
     "debug",
     "msg",
     "warning",

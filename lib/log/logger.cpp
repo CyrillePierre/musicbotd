@@ -3,7 +3,7 @@
 
 namespace log {
 
-LogEntry Logger::operator ()(int lvl) {
+LogEntry Logger::operator () (int lvl) const {
     Config & c = cfg();
     int cfgLvl = c.logLevel();
 
@@ -13,11 +13,11 @@ LogEntry Logger::operator ()(int lvl) {
             c.stream() << "[" << levels[lvl] << "] ";
         c.stream() << _prefix;
     }
-    return LogEntry{this, lvl};
+    return LogEntry{lvl};
 }
 
 
-void Logger::addTime() {
+void Logger::addTime() const {
     std::time_t t = time(nullptr);
     char buf[32];
     if (std::strftime(buf, 32, "%F %T", std::localtime(&t)))

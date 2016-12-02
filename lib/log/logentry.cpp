@@ -4,7 +4,7 @@
 namespace log {
 
 LogEntry::~LogEntry() {
-    if (logger && lvl >= cfg().logLevel())
+    if (_token && lvl >= cfg().logLevel())
         cfg().stream() << std::endl;
 }
 

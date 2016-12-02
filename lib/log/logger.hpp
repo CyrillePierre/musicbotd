@@ -10,14 +10,14 @@ class Logger {
 
 public:
     void prefix(std::string const & prefix) { _prefix = prefix; }
-    LogEntry operator () (int lvl);
+    LogEntry operator () (int lvl) const;
 
 private:
-    void addTime();
+    void addTime() const;
 };
 
 template <class T>
-LogEntry operator << (Logger & l, T && t) {
+LogEntry operator << (Logger const & l, T && t) {
     return l(msg) << std::forward<T>(t);
 }
 
