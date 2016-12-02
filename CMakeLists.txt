@@ -29,7 +29,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 # génération des exécutables pour les programmes de test
-file(GLOB test_sources test/src/*.cpp)
+file(GLOB test_sources test/*.cpp)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 foreach(test_source ${test_sources})
     get_filename_component(test_exec ${test_source} NAME_WE)
