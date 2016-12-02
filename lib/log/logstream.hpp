@@ -22,7 +22,7 @@ public:
     LogStream(Stream & os) : _os{&os} {}
     LogStream(std::string const & filename)
         : _file{std::make_unique<Fstream>(filename, std::ios::app)},
-          _os{&_file.get()} {}
+          _os(std::addressof(*_file)) {}
     LogStream(LogStream<T> const & ls) = delete;
     LogStream(LogStream<T> &&) = default;
 

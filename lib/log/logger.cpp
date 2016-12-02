@@ -20,7 +20,7 @@ LogEntry Logger::operator () (int lvl) const {
 void Logger::addTime() const {
     std::time_t t = time(nullptr);
     char buf[32];
-    if (std::strftime(buf, 32, "%F %T", std::localtime(&t)))
+    if (std::strftime(buf, 32, cfg().timeFormat().c_str(), std::localtime(&t)))
         cfg().stream() << buf << ' ';
 }
 

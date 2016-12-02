@@ -9,7 +9,7 @@ class Logger;
 class LogEntry {
     bool _token;
 public:
-    int  lvl;
+    int lvl;
 
     LogEntry(int lvl) : _token{true}, lvl{lvl} {}
     LogEntry(LogEntry && le) : _token{le._token}, lvl{le.lvl}
