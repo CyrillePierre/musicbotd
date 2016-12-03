@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include "logstream.hpp"
 
 namespace log {
@@ -9,6 +10,7 @@ class Config {
     int             _lvl         = 1;
     bool			_timeEnabled = false;
     std::string		_timeFormat  = "%F %T";
+    std::mutex      _mutex;
 
 public:
     LogStream<char>::Stream & stream() { return _ls.stream(); }
@@ -20,7 +22,8 @@ public:
     void timeEnabled(bool b) { _timeEnabled = b; }
     bool timeEnabled() const { return _timeEnabled; }
     void timeFormat(std::string const & s) { _timeFormat = s; }
-    std::string const & timeFormat() const { return _timeFormat; }
+    char const * timeFormat() const { return _timeFormat.c_str(); }
+    std::mutex & mutex() { return _mutex; }
 };
 
 inline Config & cfg() {

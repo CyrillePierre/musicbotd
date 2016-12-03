@@ -12,7 +12,7 @@ int main() {
     log::cfg().timeEnabled(true);
     log::cfg().timeFormat("%T");
     log::cfg().logLevel(log::dbg);
-    log::cfg().stream("test.log");
+//    log::cfg().stream("test.log");
 
     log::Logger logger;
     logger.prefix("main(): ");

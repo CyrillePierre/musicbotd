@@ -6,16 +6,17 @@ namespace log {
 
 class Logger;
 
+
 class LogEntry {
-    bool _token;
+    std::unique_lock<std::mutex> _lock;
 public:
     int lvl;
 
-    LogEntry(int lvl) : _token{true}, lvl{lvl} {}
-    LogEntry(LogEntry && le) : _token{le._token}, lvl{le.lvl}
-    { le._token = false; }
+    LogEntry(int lvl);
+    LogEntry(LogEntry && le);
     ~LogEntry();
 };
+
 
 template <class T>
 LogEntry operator << (LogEntry && le, T && t) {
