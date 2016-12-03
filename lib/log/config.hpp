@@ -2,12 +2,13 @@
 
 #include <mutex>
 #include "logstream.hpp"
+#include "loglevel.hpp"
 
 namespace log {
 
 class Config {
     LogStream<char> _ls          = std::cout;
-    int             _lvl         = 1;
+    int             _lvl         = log::msg;
     bool			_timeEnabled = false;
     std::string		_timeFormat  = "%F %T";
     std::mutex      _mutex;

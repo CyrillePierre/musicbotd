@@ -42,6 +42,8 @@ public:
 	/** @brief Réception de données du client. */
 	template <typename Buffer>
 	int read(Buffer && buf, std::size_t size) const;
+
+    int id() const { return _fd; }
 };
 
 } // end namespace net

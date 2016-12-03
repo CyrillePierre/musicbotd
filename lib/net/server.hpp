@@ -67,7 +67,6 @@ void net::Server::asyncAcceptLoop(Callable && fn)
 		std::forward<Callable>(fn)(c);
 
 		// Quand le client s'est déconnecté, on le retire de la liste
-		std::cout << "Déconnexion d'un client" << std::endl;
 		_clients.erase(c);
 	};
 
@@ -75,7 +74,6 @@ void net::Server::asyncAcceptLoop(Callable && fn)
 	std::thread([clientFn, this] () { 
 		while (1) {
 			accept().asyncRun(clientFn);
-			std::cout << "Connexion d'un client" << std::endl;
 		}
 	}).detach();
 }

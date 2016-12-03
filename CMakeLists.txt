@@ -15,18 +15,25 @@ set(CMAKE_MODULE_PATH cmake)
 set(CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib/x86_64-linux-gnu/)
 find_package(CURL REQUIRED)
 
-
+# lib log
 file(GLOB_RECURSE log_sources lib/log/*.cpp)
 add_library(log ${log_sources})
 
+# lib net
+file(GLOB_RECURSE net_sources lib/net/*.cpp)
+add_library(net ${net_sources})
+
 include_directories(lib)
 
+# main program
 file(GLOB_RECURSE source_files src/*.cpp)
 add_executable(${PROJECT_NAME} ${source_files})
 target_link_libraries(${PROJECT_NAME}
 	${CURL_LIBRARIES}
 	pthread
 	mpv
+	log
+	net
 	-static-libstdc++
 )
 
