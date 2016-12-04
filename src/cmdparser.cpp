@@ -6,6 +6,10 @@
 #include "config.hpp"
 #include <iostream>
 
+CmdParser::CmdParser(Player & player) : _player{player} {
+    _lg.prefix("cmdParser: ");
+}
+
 std::string CmdParser::apply(std::string const & line) {
     std::istringstream iss(line);
     std::string cmd;
@@ -16,6 +20,8 @@ std::string CmdParser::apply(std::string const & line) {
     if (cmd == "list")  return list(iss);
     if (cmd == "rm")    return rm(iss);
     if (cmd == "clear") return clear(iss);
+
+    _lg(log::warn) << "unknown command '" << cmd << "'";
     return "";
 }
 
@@ -29,6 +35,7 @@ std::string CmdParser::add(std::istringstream & iss) {
     try {
         id = id.substr(id.size() - cfg::ytIdSize);
         std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
+        _lg(log::dbg) << "video title = \"" << title << '"';
         _player.add(id, title);
         return "Adding: " + title + "\n";
     }
@@ -67,6 +74,7 @@ std::string CmdParser::rm(std::istringstream & iss) {
             auto wm = _player.remove(id);
             if (wm) return "Removing: " + wm->title() + "\n";
         }
+        _lg(log::warn) << "remove failed (id = " << id << ')';
     }
     return "Remove failed.\n";
 }

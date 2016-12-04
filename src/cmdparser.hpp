@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <log/log.hpp>
 #include "ytnamesolver.hpp"
 
 class Player;
@@ -8,9 +9,10 @@ class Player;
 class CmdParser {
     Player & _player;
     YtNameSolver _yt;
+    log::Logger _lg;
 
 public:
-    CmdParser(Player & player) : _player{player} {}
+    CmdParser(Player & player);
     std::string apply(std::string const & cmd);
 
 private:

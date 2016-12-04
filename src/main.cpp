@@ -5,14 +5,16 @@
 #include "cmdparser.hpp"
 
 int main() {
+    log::cfg().logLevel(log::trace);
     log::Logger l;
-    int port = 1937;
 
-    l << "server port (TCP): " << port;
+    int port = 1937;
 
     Player player;
     net::Server server{port};
 
+    l << "server port (TCP): " << port;
+    l << "connecting server";
     server.connect();
     server.asyncAcceptLoop([&player, &server] (net::Client const & client) {
         log::Logger lg;
@@ -26,26 +28,27 @@ int main() {
             try {
                 buf[--nbRead] = 0;
                 std::string line(buf);
-                lg << "cmd \"" << line << '"';
+                lg << "cmd '" << line << "'";
                 std::string res{parser.apply(line)};
-                if (!res.empty()) server.writeAll(res.c_str(), res.size());
+                if (!res.empty()) {
+                    lg << "server writeAll: '" << res << "'";
+                    server.writeAll(res.c_str(), res.size());
+                }
             }
             catch (std::exception const & e) {
-                lg(log::crit) << e.what();
+                lg(log::err) << e.what();
             }
         }
 
         lg << "disconnected";
     });
 
-    l << "starting player.";
+    l << "starting player";
     player.start();
 
     std::cin.get();
-    l << "disconnecting server.";
+    l << "disconnecting server";
     server.disconnect();
-    l << "stoping player.";
-    player.stop();
 
     return 0;
 }

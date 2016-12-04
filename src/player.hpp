@@ -5,7 +5,9 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 #include <util/optional.hpp>
+#include <log/log.hpp>
 #include "webmusic.hpp"
 #include "mpv/client.h"
 
@@ -22,10 +24,13 @@ private:
     Playlist                _playlist;
     bool	                _pause;
     bool                    _started;
+    std::mutex				_playMutex;
+    std::thread				_mpvEventThread;
     mutable std::mutex      _mutex;
     std::condition_variable _cv;
     mutable PlayListView	_plv;
     mpv_handle *			_mpv;
+    log::Logger				_lg;
 
 public:
     Player();
@@ -41,6 +46,7 @@ public:
     void stop();
     void togglePause();
     bool isPaused() const { return _pause; }
+    bool isStarted() const { return _started; }
     Volume incrVolume(Volume v);
     PlayListView const & list() const;
     PlayListView const & list(std::size_t nbLines) const;
@@ -49,5 +55,5 @@ public:
 private:
     void run();
     void checkError(int status) const;
-    void playNext();
+    void asyncPlayNext();
 };
