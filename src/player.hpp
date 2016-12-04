@@ -57,6 +57,7 @@ public:
     void clear();
     void start();
     void stop();
+    void next();
     void togglePause();
     bool isPaused() const { return _pause; }
     bool isStarted() const { return _started; }

@@ -20,4 +20,5 @@ private:
     std::string list(std::istringstream & iss);
     std::string rm(std::istringstream & iss);
     std::string clear(std::istringstream & iss);
+    std::string next(std::istringstream & iss);
 };

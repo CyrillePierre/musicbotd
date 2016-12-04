@@ -19,9 +19,10 @@ std::string CmdParser::apply(std::string const & line) {
     if (cmd == "list")  return list(iss);
     if (cmd == "rm")    return rm(iss);
     if (cmd == "clear") return clear(iss);
+    if (cmd == "next")  return next(iss);
 
     _lg(log::warn) << "unknown command '" << cmd << "'";
-    return "";
+    return "unknown command '" + cmd + "'";
 }
 
 std::string CmdParser::add(std::istringstream & iss) {
@@ -56,7 +57,7 @@ std::string CmdParser::list(std::istringstream & iss) {
     for (auto const & it : *plv) {
         oss << std::setw(3) << i++ << ". [" << it->id();
         oss << "] " << it->title() << std::endl;
-        _lg(log::trace) << "list += " << it->id() << ", " << it->title();
+        _lg(log::trace) << "list += [" << it->id() << "] " << it->title();
     }
     return oss.str();
 }
@@ -81,5 +82,10 @@ std::string CmdParser::rm(std::istringstream & iss) {
 
 std::string CmdParser::clear(std::istringstream &) {
     _player.clear();
+    return "";
+}
+
+std::string CmdParser::next(std::istringstream &) {
+    _player.next();
     return "";
 }

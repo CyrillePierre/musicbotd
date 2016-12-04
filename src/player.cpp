@@ -123,6 +123,12 @@ void Player::stop() {
     _cv.notify_all();
 }
 
+void Player::next() {
+    _lg(log::trace) << "next()";
+    char const * params[] = {"playlist-next", "force", nullptr};
+    checkError(mpv_command(_mpv, params));
+}
+
 void Player::togglePause() {
     _lg(log::trace) << "togglePause()";
     _pause = !_pause;

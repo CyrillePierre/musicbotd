@@ -34,7 +34,6 @@ int main() {
                 if (!res.empty()) {
                     lg << "write " << res.size() << " bytes";
                     client.write(res.c_str(), res.size());
-//                    server.writeAll(res.c_str(), res.size());
                 }
             }
             catch (std::exception const & e) {
