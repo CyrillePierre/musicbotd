@@ -40,6 +40,7 @@ void Player::add(std::string const & id, std::string const & name) {
     _playlist.push_back(WebMusic{id, name});
     _mutex.unlock();
     _cv.notify_one();
+    sendEvent(PlayerEvt::added);
 }
 
 void Player::add(const WebMusic &m) {
@@ -49,13 +50,17 @@ void Player::add(const WebMusic &m) {
     _playlist.push_back(m);
     _mutex.unlock();
     _cv.notify_one();
+    sendEvent(PlayerEvt::added);
 }
 
 void Player::remove(Playlist::const_iterator it) {
     _lg(log::trace) << "remove(iterator = " << &it << ')';
-    Lock lock{_mutex};
-    _plv.clear();
-    _playlist.erase(it);
+    {
+        Lock lock{_mutex};
+        _plv.clear();
+        _playlist.erase(it);
+    }
+    sendEvent(PlayerEvt::removed);
 }
 
 util::Optional<WebMusic> Player::remove(std::string const & id) {
@@ -66,9 +71,12 @@ util::Optional<WebMusic> Player::remove(std::string const & id) {
     if (it != _playlist.end()) {
         auto music = util::makeOptional(std::move(*it));
 
-        Lock lock{_mutex};
-        _plv.clear();
-        _playlist.erase(it);
+        {
+            Lock lock{_mutex};
+            _plv.clear();
+            _playlist.erase(it);
+        }
+        sendEvent(PlayerEvt::removed);
         return music;
     }
     return util::Optional<WebMusic>{};
@@ -81,9 +89,12 @@ util::Optional<WebMusic> Player::remove(std::size_t index) {
         Playlist::const_iterator it = _plv[index];
         auto music = util::makeOptional(std::move(*it));
 
-        Lock lock{_mutex};
-        _plv.clear();
-        _playlist.erase(it);
+        {
+            Lock lock{_mutex};
+            _plv.clear();
+            _playlist.erase(it);
+        }
+        sendEvent(PlayerEvt::removed);
         return music;
     }
     return util::Optional<WebMusic>{};
@@ -91,9 +102,12 @@ util::Optional<WebMusic> Player::remove(std::size_t index) {
 
 void Player::clear() {
     _lg(log::trace) << "clear()";
-    Lock lock{_mutex};
-    _plv.clear();
-    _playlist.clear();
+    {
+        Lock lock{_mutex};
+        _plv.clear();
+        _playlist.clear();
+    }
+    sendEvent(PlayerEvt::cleared);
 }
 
 void Player::start() {
@@ -112,10 +126,12 @@ void Player::togglePause() {
     _lg(log::trace) << "togglePause()";
     _pause = !_pause;
     _lg << "pause state = " << _pause;
+    sendEvent(PlayerEvt::paused);
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
     _lg(log::trace) << "incrVolume(" << v << ')';
+    sendEvent(PlayerEvt::volumeChanged);
 }
 
 Player::PlayListView const & Player::list() const {
@@ -165,7 +181,6 @@ void Player::asyncPlayNext() {
 
     Lock lock{_playMutex, std::adopt_lock};
     std::thread([this, playLock = std::move(lock)] {
-        _lg(log::dbg) << "creating music waiting thread";
         WebMusic currentMusic;
         {
             Lock lock{_mutex};
@@ -174,10 +189,14 @@ void Player::asyncPlayNext() {
             currentMusic = _playlist.front();
             _playlist.pop_front();
         }
+        sendEvent(PlayerEvt::currentChanged);
         std::string url = currentMusic.url();
         char const * params[] = {"loadfile", url.c_str(), nullptr};
         checkError(mpv_command(_mpv, params));
     }).detach();
 }
 
-
+void Player::sendEvent(PlayerEvt pe) {
+    _lg << "sending event: " << (int)pe;
+    if (_evtFn) _evtFn(pe);
+}

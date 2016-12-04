@@ -6,10 +6,20 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
+#include <functional>
 #include <util/optional.hpp>
 #include <log/log.hpp>
 #include "webmusic.hpp"
 #include "mpv/client.h"
+
+enum class PlayerEvt {
+    added,
+    removed,
+    currentChanged,
+    volumeChanged,
+    paused,
+    cleared,
+};
 
 /**
  * This class allows to execute a player to play music with a playlist of URLs.
@@ -19,6 +29,7 @@ struct Player {
     using Volume = unsigned short;
     using PlayListView = std::vector<Playlist::const_iterator>;
     using Lock = std::unique_lock<std::mutex>;
+    using EventHandler = std::function<void(PlayerEvt)>;
 
 private:
     Playlist                _playlist;
@@ -31,6 +42,7 @@ private:
     mutable PlayListView	_plv;
     mpv_handle *			_mpv;
     log::Logger				_lg;
+    EventHandler			_evtFn;
 
 public:
     Player();
@@ -51,9 +63,11 @@ public:
     PlayListView const & list() const;
     PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;
+    void setEventHandler(EventHandler const & eh) { _evtFn = eh; }
 
 private:
     void run();
     void checkError(int status) const;
     void asyncPlayNext();
+    void sendEvent(PlayerEvt pe);
 };
