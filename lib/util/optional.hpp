@@ -14,6 +14,10 @@ public:
     Optional(T const & t) : _t{t}, _hasValue{true} {}
     Optional(T && t) : _t{t}, _hasValue{true} {}
 
+    T       && get()       && { return std::move(_t); }
+    T       &  get()       &  { return _t; }
+    T const &  get() const &  { return _t; }
+
     operator bool () const { return _hasValue; }
     operator T () { return _t; }
     T * operator * () { return &_t; }

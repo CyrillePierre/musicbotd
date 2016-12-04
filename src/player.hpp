@@ -8,12 +8,13 @@
 #include <thread>
 #include <functional>
 #include <util/optional.hpp>
+#include <util/any.hpp>
 #include <log/log.hpp>
 #include "webmusic.hpp"
 #include "mpv/client.h"
 
-enum class PlayerEvt {
-    added,
+enum PlayerEvt {
+    added = 0,
     removed,
     currentChanged,
     volumeChanged,
@@ -29,7 +30,7 @@ struct Player {
     using Volume = unsigned short;
     using PlayListView = std::vector<Playlist::const_iterator>;
     using Lock = std::unique_lock<std::mutex>;
-    using EventHandler = std::function<void(PlayerEvt)>;
+    using EventHandler = std::function<void(PlayerEvt, util::Any)>;
 
 private:
     Playlist                _playlist;
@@ -69,5 +70,5 @@ private:
     void run();
     void checkError(int status) const;
     void asyncPlayNext();
-    void sendEvent(PlayerEvt pe);
+    void sendEvent(PlayerEvt pe, util::Any && any = util::Any{});
 };

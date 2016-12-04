@@ -39,8 +39,8 @@ void Player::add(std::string const & id, std::string const & name) {
     _plv.clear();
     _playlist.push_back(WebMusic{id, name});
     _mutex.unlock();
+    sendEvent(PlayerEvt::added, _playlist.back());
     _cv.notify_one();
-    sendEvent(PlayerEvt::added);
 }
 
 void Player::add(const WebMusic &m) {
@@ -50,17 +50,18 @@ void Player::add(const WebMusic &m) {
     _playlist.push_back(m);
     _mutex.unlock();
     _cv.notify_one();
-    sendEvent(PlayerEvt::added);
+    sendEvent(PlayerEvt::added, _playlist.back());
 }
 
 void Player::remove(Playlist::const_iterator it) {
     _lg(log::trace) << "remove(iterator = " << &it << ')';
+    WebMusic wm = std::move(*it);
     {
         Lock lock{_mutex};
         _plv.clear();
         _playlist.erase(it);
     }
-    sendEvent(PlayerEvt::removed);
+    sendEvent(PlayerEvt::removed, std::move(wm));
 }
 
 util::Optional<WebMusic> Player::remove(std::string const & id) {
@@ -76,7 +77,7 @@ util::Optional<WebMusic> Player::remove(std::string const & id) {
             _plv.clear();
             _playlist.erase(it);
         }
-        sendEvent(PlayerEvt::removed);
+        sendEvent(PlayerEvt::removed, music.get());
         return music;
     }
     return util::Optional<WebMusic>{};
@@ -94,7 +95,7 @@ util::Optional<WebMusic> Player::remove(std::size_t index) {
             _plv.clear();
             _playlist.erase(it);
         }
-        sendEvent(PlayerEvt::removed);
+        sendEvent(PlayerEvt::removed, music.get());
         return music;
     }
     return util::Optional<WebMusic>{};
@@ -126,7 +127,7 @@ void Player::togglePause() {
     _lg(log::trace) << "togglePause()";
     _pause = !_pause;
     _lg << "pause state = " << _pause;
-    sendEvent(PlayerEvt::paused);
+    sendEvent(PlayerEvt::paused, _pause);
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
@@ -189,14 +190,14 @@ void Player::asyncPlayNext() {
             currentMusic = _playlist.front();
             _playlist.pop_front();
         }
-        sendEvent(PlayerEvt::currentChanged);
+        sendEvent(PlayerEvt::currentChanged, currentMusic);
         std::string url = currentMusic.url();
         char const * params[] = {"loadfile", url.c_str(), nullptr};
         checkError(mpv_command(_mpv, params));
     }).detach();
 }
 
-void Player::sendEvent(PlayerEvt pe) {
+void Player::sendEvent(PlayerEvt pe, util::Any && any) {
     _lg << "sending event: " << (int)pe;
-    if (_evtFn) _evtFn(pe);
+    if (_evtFn) _evtFn(pe, std::move(any));
 }

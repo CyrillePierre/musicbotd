@@ -4,7 +4,6 @@
 #include "player.hpp"
 #include "ytnamesolver.hpp"
 #include "config.hpp"
-#include <iostream>
 
 CmdParser::CmdParser(Player & player) : _player{player} {
     _lg.prefix("cmdParser: ");
@@ -37,7 +36,7 @@ std::string CmdParser::add(std::istringstream & iss) {
         std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
         _lg(log::dbg) << "video title = \"" << title << '"';
         _player.add(id, title);
-        return "Adding: " + title + "\n";
+        return "";
     }
     catch (UnknownVideo const & e) {
         return std::string{e.what()} + "\n";
@@ -57,6 +56,7 @@ std::string CmdParser::list(std::istringstream & iss) {
     for (auto const & it : *plv) {
         oss << std::setw(3) << i++ << ". [" << it->id();
         oss << "] " << it->title() << std::endl;
+        _lg(log::trace) << "list += " << it->id() << ", " << it->title();
     }
     return oss.str();
 }
@@ -68,11 +68,11 @@ std::string CmdParser::rm(std::istringstream & iss) {
         std::size_t index = std::strtoul(id.c_str(), &end, 10);
         if (!*end) {
             auto wm = _player.remove(index);
-            if (wm) return "Removing: " + wm->title() + "\n";
+            if (wm) return "";
         }
         else if (id.size() == cfg::ytIdSize){
             auto wm = _player.remove(id);
-            if (wm) return "Removing: " + wm->title() + "\n";
+            if (wm) return "";
         }
         _lg(log::warn) << "remove failed (id = " << id << ')';
     }
@@ -81,5 +81,5 @@ std::string CmdParser::rm(std::istringstream & iss) {
 
 std::string CmdParser::clear(std::istringstream &) {
     _player.clear();
-    return "Playlist cleared.\n";
+    return "";
 }

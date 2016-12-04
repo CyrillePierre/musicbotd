@@ -3,6 +3,7 @@
 #include <log/log.hpp>
 #include "player.hpp"
 #include "cmdparser.hpp"
+#include "eventviewer.hpp"
 
 int main() {
     log::cfg().logLevel(log::trace);
@@ -31,8 +32,9 @@ int main() {
                 lg << "cmd '" << line << "'";
                 std::string res{parser.apply(line)};
                 if (!res.empty()) {
-                    lg << "server writeAll: '" << res << "'";
-                    server.writeAll(res.c_str(), res.size());
+                    lg << "write " << res.size() << " bytes";
+                    client.write(res.c_str(), res.size());
+//                    server.writeAll(res.c_str(), res.size());
                 }
             }
             catch (std::exception const & e) {
@@ -44,6 +46,13 @@ int main() {
     });
 
     l << "starting player";
+    player.setEventHandler([&server, &l] (PlayerEvt evt, util::Any any) {
+        std::string msg = view::eventFormat(evt, std::move(any));
+        l << "server writeAll: '" << msg << "'";
+        msg.push_back('\n');
+        server.writeAll(msg.c_str(), msg.size());
+    });
+
     player.start();
 
     std::cin.get();
