@@ -125,7 +125,7 @@ void Player::stop() {
 
 void Player::next() {
     _lg(log::trace) << "next()";
-    char const * params[] = {"playlist-next", "force", nullptr};
+    char const * params[] = {"stop", nullptr};
     checkError(mpv_command(_mpv, params));
 }
 

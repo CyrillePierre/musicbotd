@@ -20,7 +20,7 @@ std::array<EventWriter, 6> const eventWriters {
 
 
 std::string eventFormat(PlayerEvt evt, util::Any a) {
-    return eventWriters[evt](a);
+    return eventWriters[evt](std::move(a));
 }
 
 }

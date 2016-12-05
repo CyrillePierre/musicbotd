@@ -37,7 +37,7 @@ class Any {
 
 public:
     Any() {}
-    Any(Any const & any) : _data{any._data->copy()} {}
+    Any(Any const & any) : _data{any._data ? any._data->copy() : nullptr} {}
     Any(Any && any)      : _data{any._data} { any._data = nullptr; }
 
     template <class T,
