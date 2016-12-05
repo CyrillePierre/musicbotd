@@ -15,23 +15,27 @@ std::string CmdParser::apply(std::string const & line) {
 
     iss >> cmd;
 
-    if (cmd == "add")   return add(iss);
-    if (cmd == "list")  return list(iss);
-    if (cmd == "rm")    return rm(iss);
-    if (cmd == "clear") return clear(iss);
-    if (cmd == "next")  return next(iss);
-    if (cmd == "pause") return pause(iss);
+    if (cmd == "add")    return add(iss);
+    if (cmd == "list")   return list(iss);
+    if (cmd == "rm")     return rm(iss);
+    if (cmd == "clear")  return clear(iss);
+    if (cmd == "next")   return next(iss);
+    if (cmd == "pause")  return pause(iss);
+    if (cmd == "volume") return volume(iss);
 
     _lg(log::warn) << "unknown command '" << cmd << "'";
-    return "unknown command '" + cmd + "'";
+    return "unknown command '" + cmd + "'\n";
 }
 
 std::string CmdParser::add(std::istringstream & iss) {
     std::string id;
     iss >> id;
 
-    if (id.size() < cfg::ytIdSize)
-        return "Invalid video ID : '" + id + "'\n";
+    if (id.size() < cfg::ytIdSize) {
+        std::string err{"Invalid video ID : '" + id};
+        _lg(log::warn) << err;
+        return std::move(err) + "\n";
+    }
 
     try {
         id = id.substr(id.size() - cfg::ytIdSize);
@@ -52,7 +56,7 @@ std::string CmdParser::list(std::istringstream & iss) {
     else plv = &_player.list();
 
     std::ostringstream oss;
-    oss << "Actual playlist:" << std::endl;
+    oss << "Current playlist:" << std::endl;
 
     int i = 0;
     for (auto const & it : *plv) {
@@ -78,6 +82,7 @@ std::string CmdParser::rm(std::istringstream & iss) {
         }
         _lg(log::warn) << "remove failed (id = " << id << ')';
     }
+    else _lg(log::warn) << "Remove failed: parsing error";
     return "Remove failed.\n";
 }
 
@@ -91,7 +96,17 @@ std::string CmdParser::next(std::istringstream &) {
     return "";
 }
 
-std::string CmdParser::pause(std::istringstream &iss) {
+std::string CmdParser::pause(std::istringstream &) {
     _player.togglePause();
     return "";
+}
+
+std::string CmdParser::volume(std::istringstream & iss) {
+    Player::Volume value;
+
+    if (iss >> value) {
+        Player::Volume vol = _player.incrVolume(value);
+        return "";
+    }
+    return "Volume = " + std::to_string(_player.volume()) + "\n";
 }

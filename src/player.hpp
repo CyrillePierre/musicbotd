@@ -27,7 +27,7 @@ enum PlayerEvt {
  */
 struct Player {
     using Playlist = std::list<WebMusic>;
-    using Volume = unsigned short;
+    using Volume = double;
     using PlayListView = std::vector<Playlist::const_iterator>;
     using Lock = std::unique_lock<std::mutex>;
     using EventHandler = std::function<void(PlayerEvt, util::Any)>;
@@ -62,6 +62,7 @@ public:
     bool isPaused() const { return _pause; }
     bool isStarted() const { return _started; }
     Volume incrVolume(Volume v);
+    Volume volume();
     PlayListView const & list() const;
     PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;

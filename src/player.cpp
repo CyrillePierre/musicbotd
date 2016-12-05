@@ -144,7 +144,20 @@ void Player::togglePause() {
 
 Player::Volume Player::incrVolume(Player::Volume v) {
     _lg(log::trace) << "incrVolume(" << v << ')';
-    sendEvent(PlayerEvt::volumeChanged);
+    Player::Volume vol = volume();
+    vol += v;
+    checkError(mpv_set_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
+    checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
+    sendEvent(PlayerEvt::volumeChanged, vol);
+    return vol;
+}
+
+Player::Volume Player::volume() {
+    _lg(log::trace) << "volume()";
+    Player::Volume vol;
+    checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
+    _lg(log::dbg) << "current volume = " << vol;
+    return vol;
 }
 
 Player::PlayListView const & Player::list() const {

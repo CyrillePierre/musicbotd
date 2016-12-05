@@ -22,4 +22,5 @@ private:
     std::string clear(std::istringstream & iss);
     std::string next(std::istringstream & iss);
     std::string pause(std::istringstream & iss);
+    std::string volume(std::istringstream & iss);
 };

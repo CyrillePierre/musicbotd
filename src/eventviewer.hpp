@@ -13,7 +13,7 @@ std::array<EventWriter, 6> const eventWriters {
     [] (util::Any a) { return "Adding: " + a.cast<WebMusic>().title(); },
     [] (util::Any a) { return "Removing: " + a.cast<WebMusic>().title(); },
     [] (util::Any a) { return "Playing: " + a.cast<WebMusic>().title(); },
-    [] (util::Any)   { return "Volume changed."; },
+    [] (util::Any a) { return "New volume: " + std::to_string(a.cast<double>()) + "%"; },
     [] (util::Any a) { return a.cast<bool>() ? "Player paused" : "Player resumed."; },
     [] (util::Any)   { return "Playlist cleared."; },
 };
