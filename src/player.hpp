@@ -67,6 +67,9 @@ public:
     PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;
     void setEventHandler(EventHandler const & eh) { _evtFn = eh; }
+    bool hasCurrent();
+    double duration();
+    double timePos();
 
 private:
     void run();

@@ -15,13 +15,14 @@ std::string CmdParser::apply(std::string const & line) {
 
     iss >> cmd;
 
-    if (cmd == "add")    return add(iss);
-    if (cmd == "list")   return list(iss);
-    if (cmd == "rm")     return rm(iss);
-    if (cmd == "clear")  return clear(iss);
-    if (cmd == "next")   return next(iss);
-    if (cmd == "pause")  return pause(iss);
-    if (cmd == "volume") return volume(iss);
+    if (cmd == "add")      return add(iss);
+    if (cmd == "list")     return list(iss);
+    if (cmd == "rm")       return rm(iss);
+    if (cmd == "clear")    return clear(iss);
+    if (cmd == "next")     return next(iss);
+    if (cmd == "pause")    return pause(iss);
+    if (cmd == "volume")   return volume(iss);
+    if (cmd == "progress") return progress(iss);
 
     _lg(log::warn) << "unknown command '" << cmd << "'";
     return "unknown command '" + cmd + "'\n";
@@ -109,4 +110,13 @@ std::string CmdParser::volume(std::istringstream & iss) {
         return "";
     }
     return "Volume = " + std::to_string(_player.volume()) + "\n";
+}
+
+std::string CmdParser::progress(std::istringstream & iss) {
+    double dur = _player.duration();
+    double time = _player.timePos();
+    std::ostringstream oss;
+    oss << "Progress: " << time << "s / " << dur << "s (";
+    oss << time*100/dur << "%)\n";
+    return oss.str();
 }

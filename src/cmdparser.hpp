@@ -23,4 +23,5 @@ private:
     std::string next(std::istringstream & iss);
     std::string pause(std::istringstream & iss);
     std::string volume(std::istringstream & iss);
+    std::string progress(std::istringstream & iss);
 };

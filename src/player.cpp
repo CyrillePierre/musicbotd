@@ -184,6 +184,22 @@ std::size_t Player::playlistSize() const {
     return _playlist.size();
 }
 
+double Player::duration() {
+    _lg(log::trace) << "currentDuration()";
+    double val;
+    checkError(mpv_get_property(_mpv, "duration", MPV_FORMAT_DOUBLE, &val));
+    _lg(log::dbg) << "duration = " << val << " s";
+    return val;
+}
+
+double Player::timePos() {
+    _lg(log::trace) << "timePos()";
+    double time;
+    checkError(mpv_get_property(_mpv, "time-pos", MPV_FORMAT_DOUBLE, &time));
+    _lg(log::dbg) << "time = " << time << " s";
+    return time;
+}
+
 void Player::run() {
     _lg << "mpv thread created";
     while (_started) {
