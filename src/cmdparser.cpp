@@ -20,6 +20,7 @@ std::string CmdParser::apply(std::string const & line) {
     if (cmd == "rm")    return rm(iss);
     if (cmd == "clear") return clear(iss);
     if (cmd == "next")  return next(iss);
+    if (cmd == "pause") return pause(iss);
 
     _lg(log::warn) << "unknown command '" << cmd << "'";
     return "unknown command '" + cmd + "'";
@@ -87,5 +88,10 @@ std::string CmdParser::clear(std::istringstream &) {
 
 std::string CmdParser::next(std::istringstream &) {
     _player.next();
+    return "";
+}
+
+std::string CmdParser::pause(std::istringstream &iss) {
+    _player.togglePause();
     return "";
 }

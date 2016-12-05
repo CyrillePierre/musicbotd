@@ -20,6 +20,7 @@ Player::Player() : _pause{false}, _started{false} {
     _lg << "  - ytdl   = " << mpv_get_property_string(_mpv, "ytdl");
     _lg << "  - video  = " << mpv_get_property_string(_mpv, "video");
     _lg << "  - volume = " << mpv_get_property_string(_mpv, "volume");
+    _lg << "  - pause  = " << mpv_get_property_string(_mpv, "pause");
 
 }
 
@@ -131,8 +132,13 @@ void Player::next() {
 
 void Player::togglePause() {
     _lg(log::trace) << "togglePause()";
-    _pause = !_pause;
-    _lg << "pause state = " << _pause;
+    int pauseState;
+    checkError(mpv_get_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
+    _lg(log::dbg) << "current pause state = " << pauseState;
+    pauseState = !pauseState;
+    checkError(mpv_set_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
+    _lg << "pause state = " << pauseState;
+    _pause = pauseState;
     sendEvent(PlayerEvt::paused, _pause);
 }
 

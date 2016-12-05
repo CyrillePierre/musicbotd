@@ -47,8 +47,12 @@ public:
 
     ~Any() { delete _data; }
     Any & operator = (Any && any) { swap(*this, any); return *this; }
-    Any & operator = (Any const & any)
-    { if (&any != this) delete _data, _data = any._data->copy(); }
+    Any & operator = (Any const & any) {
+        if (&any != this) {
+            delete _data;
+            _data = any._data ? any._data->copy() : nullptr;
+        }
+    }
 
     friend void swap(Any & a, Any & b) { std::swap(a._data, b._data); }
     bool has_value() const { return _data; }
