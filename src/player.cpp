@@ -19,10 +19,11 @@ Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
     checkError(mpv_initialize(_mpv));
 
     _lg << "mpv options:";
-    _lg << "  - ytdl   = " << mpv_get_property_string(_mpv, "ytdl");
-    _lg << "  - video  = " << mpv_get_property_string(_mpv, "video");
-    _lg << "  - volume = " << mpv_get_property_string(_mpv, "volume");
-    _lg << "  - pause  = " << mpv_get_property_string(_mpv, "pause");
+    _lg << "  - version = " << mpv_get_property_string(_mpv, "mpv-version");
+    _lg << "  - ytdl    = " << mpv_get_property_string(_mpv, "ytdl");
+    _lg << "  - video   = " << mpv_get_property_string(_mpv, "video");
+    _lg << "  - volume  = " << mpv_get_property_string(_mpv, "volume");
+    _lg << "  - pause   = " << mpv_get_property_string(_mpv, "pause");
 
 }
 
