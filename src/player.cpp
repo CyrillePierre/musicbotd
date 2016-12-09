@@ -18,6 +18,8 @@ Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
     checkError(mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt));
     checkError(mpv_initialize(_mpv));
 
+    checkError(mpv_request_log_messages(_mpv, "trace"));
+
     _lg << "mpv options:";
     _lg << "  - version = " << mpv_get_property_string(_mpv, "mpv-version");
     _lg << "  - ytdl    = " << mpv_get_property_string(_mpv, "ytdl");
@@ -215,7 +217,14 @@ void Player::run() {
     _lg << "mpv thread created";
     while (_started) {
         mpv_event *evt = mpv_wait_event(_mpv, 10000);
-        _lg(elog::dbg) << "mpv event: " << mpv_event_name(evt->event_id);
+        std::string name{mpv_event_name(evt->event_id)};
+        std::string text;
+        if(name == "log-message") {
+            text = std::string{static_cast<mpv_event_log_message*>(evt->data)->text};
+            text.pop_back();
+        } else
+            text = name;
+        _lg(elog::dbg) << "mpv event: " << text;
         switch (evt->event_id) {
         case MPV_EVENT_SHUTDOWN: stop();          break;
         case MPV_EVENT_IDLE:     asyncPlayNext(); break;
