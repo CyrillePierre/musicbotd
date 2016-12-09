@@ -4,7 +4,9 @@
 #include <stdexcept>
 #include "player.hpp"
 
-Player::Player() : _pause{false}, _started{false} {
+namespace log = ese::log;
+
+Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
     _lg.prefix("player: ");
 
     _mpv = mpv_create();
@@ -184,6 +186,10 @@ std::size_t Player::playlistSize() const {
     return _playlist.size();
 }
 
+bool Player::hasCurrent() {
+
+}
+
 double Player::duration() {
     _lg(log::trace) << "currentDuration()";
     double val;
@@ -198,6 +204,10 @@ double Player::timePos() {
     checkError(mpv_get_property(_mpv, "time-pos", MPV_FORMAT_DOUBLE, &time));
     _lg(log::dbg) << "time = " << time << " s";
     return time;
+}
+
+WebMusic Player::current() {
+
 }
 
 void Player::run() {
@@ -224,6 +234,7 @@ void Player::asyncPlayNext() {
     Lock lock{_playMutex, std::adopt_lock};
     std::thread([this, playLock = std::move(lock)] {
         WebMusic currentMusic;
+        _isPlaying = false;
         {
             Lock lock{_mutex};
             _cv.wait(lock, [this] { return !_playlist.empty() || !_started; });
@@ -231,6 +242,7 @@ void Player::asyncPlayNext() {
             currentMusic = _playlist.front();
             _playlist.pop_front();
         }
+        _isPlaying = true;
         sendEvent(PlayerEvt::currentChanged, currentMusic);
         std::string url = currentMusic.url();
         char const * params[] = {"loadfile", url.c_str(), nullptr};

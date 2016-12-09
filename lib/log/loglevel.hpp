@@ -1,5 +1,6 @@
 #pragma once
 
+namespace ese {
 namespace log {
 
 enum LogLevel {
@@ -20,4 +21,5 @@ constexpr std::array<char const *, 6> levels {
     "critical"
 };
 
+}
 }

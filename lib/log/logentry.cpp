@@ -1,6 +1,7 @@
 #include "logentry.hpp"
 #include "logger.hpp"
 
+namespace ese {
 namespace log {
 
 LogEntry::LogEntry(int lvl) : _lock{cfg().mutex()}, lvl{lvl}
@@ -15,4 +16,5 @@ LogEntry::~LogEntry() {
         cfg().stream() << std::endl;
 }
 
+}
 }

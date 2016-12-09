@@ -5,6 +5,8 @@
 #include "cmdparser.hpp"
 #include "eventviewer.hpp"
 
+namespace log = ese::log;
+
 int main() {
     log::cfg().logLevel(log::trace);
     log::Logger l;

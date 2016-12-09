@@ -1,6 +1,7 @@
 #include <ctime>
 #include "logger.hpp"
 
+namespace ese {
 namespace log {
 
 LogEntry Logger::operator () (int lvl) const {
@@ -24,4 +25,5 @@ void Logger::addTime() const {
         cfg().stream() << buf << ' ';
 }
 
+}
 }

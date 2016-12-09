@@ -1,6 +1,8 @@
 #include <iostream>
 #include <log/log.hpp>
 
+namespace log = ese::log;
+
 void test() {
     log::Logger l;
     l.prefix("test(): ");

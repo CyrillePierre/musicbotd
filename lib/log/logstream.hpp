@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 
+namespace ese {
 namespace log {
 
 template <class T>
@@ -37,4 +38,5 @@ public:
     }
 };
 
+}
 }

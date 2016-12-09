@@ -4,6 +4,7 @@
 #include "logstream.hpp"
 #include "loglevel.hpp"
 
+namespace ese {
 namespace log {
 
 class Config {
@@ -32,4 +33,5 @@ inline Config & cfg() {
     return *c;
 }
 
+}
 }

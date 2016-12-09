@@ -52,6 +52,7 @@ public:
             delete _data;
             _data = any._data ? any._data->copy() : nullptr;
         }
+        return *this;
     }
 
     friend void swap(Any & a, Any & b) { std::swap(a._data, b._data); }

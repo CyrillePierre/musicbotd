@@ -2,6 +2,7 @@
 
 #include "config.hpp"
 
+namespace ese {
 namespace log {
 
 class Logger;
@@ -25,4 +26,5 @@ LogEntry operator << (LogEntry && le, T && t) {
     return std::move(le);
 }
 
+}
 }

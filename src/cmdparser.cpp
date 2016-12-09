@@ -5,6 +5,8 @@
 #include "ytnamesolver.hpp"
 #include "config.hpp"
 
+namespace log = ese::log;
+
 CmdParser::CmdParser(Player & player) : _player{player} {
     _lg.prefix("cmdParser: ");
 }

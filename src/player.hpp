@@ -36,13 +36,14 @@ private:
     Playlist                _playlist;
     bool	                _pause;
     bool                    _started;
+    bool					_isPlaying;
     std::mutex				_playMutex;
     std::thread				_mpvEventThread;
     mutable std::mutex      _mutex;
     std::condition_variable _cv;
     mutable PlayListView	_plv;
     mpv_handle *			_mpv;
-    log::Logger				_lg;
+    ese::log::Logger		_lg;
     EventHandler			_evtFn;
 
 public:
@@ -70,6 +71,7 @@ public:
     bool hasCurrent();
     double duration();
     double timePos();
+    WebMusic current();
 
 private:
     void run();

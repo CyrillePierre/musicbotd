@@ -9,7 +9,7 @@ class Player;
 class CmdParser {
     Player & _player;
     YtNameSolver _yt;
-    log::Logger _lg;
+    ese::log::Logger _lg;
 
 public:
     CmdParser(Player & player);

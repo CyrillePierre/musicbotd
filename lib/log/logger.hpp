@@ -3,6 +3,7 @@
 #include "logentry.hpp"
 #include "loglevel.hpp"
 
+namespace ese {
 namespace log {
 
 class Logger {
@@ -21,4 +22,5 @@ LogEntry operator << (Logger const & l, T && t) {
     return l(msg) << std::forward<T>(t);
 }
 
+}
 }
