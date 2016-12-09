@@ -1,0 +1,27 @@
+#pragma once
+
+#include <sstream>
+#include <log/log.hpp>
+#include "ytnamesolver.hpp"
+
+class Player;
+
+class CmdParserAPI {
+    Player & _player;
+    YtNameSolver _yt;
+    ese::log::Logger _lg;
+
+public:
+    CmdParserAPI(Player & player);
+    std::string apply(std::string const & cmd);
+
+private:
+    std::string add(std::istringstream & iss);
+    std::string list(std::istringstream & iss);
+    std::string rm(std::istringstream & iss);
+    std::string clear(std::istringstream & iss);
+    std::string next(std::istringstream & iss);
+    std::string pause(std::istringstream & iss);
+    std::string volume(std::istringstream & iss);
+    std::string progress(std::istringstream & iss);
+};
