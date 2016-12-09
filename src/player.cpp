@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include "player.hpp"
 
-namespace log = ese::log;
+namespace elog = ese::log;
 
 Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
     _lg.prefix("player: ");
@@ -33,11 +33,11 @@ Player::~Player() {
         _mpvEventThread.join();			// wait mpv event thread
         Lock lock{_playMutex};			// wait playNext thread
     }
-    _lg(log::trace) << "~Player() end";
+    _lg(elog::trace) << "~Player() end";
 }
 
 void Player::add(std::string const & id, std::string const & name) {
-    _lg(log::trace) << "add(" << id << ", " << name << ')';
+    _lg(elog::trace) << "add(" << id << ", " << name << ')';
     _mutex.lock();
     _plv.clear();
     _playlist.push_back(WebMusic{id, name});
@@ -47,7 +47,7 @@ void Player::add(std::string const & id, std::string const & name) {
 }
 
 void Player::add(const WebMusic &m) {
-    _lg(log::trace) << "add(WebMusic{" << m.id() << ", " << m.title() << "})";
+    _lg(elog::trace) << "add(WebMusic{" << m.id() << ", " << m.title() << "})";
     _mutex.lock();
     _plv.clear();
     _playlist.push_back(m);
@@ -57,7 +57,7 @@ void Player::add(const WebMusic &m) {
 }
 
 void Player::remove(Playlist::const_iterator it) {
-    _lg(log::trace) << "remove(iterator = " << &it << ')';
+    _lg(elog::trace) << "remove(iterator = " << &it << ')';
     WebMusic wm = std::move(*it);
     {
         Lock lock{_mutex};
@@ -68,7 +68,7 @@ void Player::remove(Playlist::const_iterator it) {
 }
 
 util::Optional<WebMusic> Player::remove(std::string const & id) {
-    _lg(log::trace) << "remove(" << id << ')';
+    _lg(elog::trace) << "remove(" << id << ')';
 
     Playlist::iterator it = std::find_if(_playlist.begin(), _playlist.end(),
         [&id] (WebMusic const & m) { return m.id() == id; });
@@ -87,7 +87,7 @@ util::Optional<WebMusic> Player::remove(std::string const & id) {
 }
 
 util::Optional<WebMusic> Player::remove(std::size_t index) {
-    _lg(log::trace) << "remove(" << index << ')';
+    _lg(elog::trace) << "remove(" << index << ')';
 
     if (index < _plv.size()) {
         Playlist::const_iterator it = _plv[index];
@@ -105,7 +105,7 @@ util::Optional<WebMusic> Player::remove(std::size_t index) {
 }
 
 void Player::clear() {
-    _lg(log::trace) << "clear()";
+    _lg(elog::trace) << "clear()";
     {
         Lock lock{_mutex};
         _plv.clear();
@@ -115,28 +115,28 @@ void Player::clear() {
 }
 
 void Player::start() {
-    _lg(log::trace) << "start()";
+    _lg(elog::trace) << "start()";
     _started = true;
     _mpvEventThread = std::thread{&Player::run, this};
 }
 
 void Player::stop() {
-    _lg(log::trace) << "stop()";
+    _lg(elog::trace) << "stop()";
     _started = false;
     _cv.notify_all();
 }
 
 void Player::next() {
-    _lg(log::trace) << "next()";
+    _lg(elog::trace) << "next()";
     char const * params[] = {"stop", nullptr};
     checkError(mpv_command(_mpv, params));
 }
 
 void Player::togglePause() {
-    _lg(log::trace) << "togglePause()";
+    _lg(elog::trace) << "togglePause()";
     int pauseState;
     checkError(mpv_get_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
-    _lg(log::dbg) << "current pause state = " << pauseState;
+    _lg(elog::dbg) << "current pause state = " << pauseState;
     pauseState = !pauseState;
     checkError(mpv_set_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
     _lg << "pause state = " << pauseState;
@@ -145,7 +145,7 @@ void Player::togglePause() {
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
-    _lg(log::trace) << "incrVolume(" << v << ')';
+    _lg(elog::trace) << "incrVolume(" << v << ')';
     Player::Volume vol = volume();
     vol += v;
     checkError(mpv_set_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
@@ -155,20 +155,20 @@ Player::Volume Player::incrVolume(Player::Volume v) {
 }
 
 Player::Volume Player::volume() {
-    _lg(log::trace) << "volume()";
+    _lg(elog::trace) << "volume()";
     Player::Volume vol;
     checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
-    _lg(log::dbg) << "current volume = " << vol;
+    _lg(elog::dbg) << "current volume = " << vol;
     return vol;
 }
 
 Player::PlayListView const & Player::list() const {
-    _lg(log::trace) << "list()";
+    _lg(elog::trace) << "list()";
     return list(_playlist.size());
 }
 
 Player::PlayListView const & Player::list(std::size_t nbLines) const {
-    _lg(log::trace) << "list(" << nbLines << ')';
+    _lg(elog::trace) << "list(" << nbLines << ')';
 
     Lock lock{_mutex};
     _plv.clear();
@@ -191,18 +191,18 @@ bool Player::hasCurrent() {
 }
 
 double Player::duration() {
-    _lg(log::trace) << "currentDuration()";
+    _lg(elog::trace) << "currentDuration()";
     double val;
     checkError(mpv_get_property(_mpv, "duration", MPV_FORMAT_DOUBLE, &val));
-    _lg(log::dbg) << "duration = " << val << " s";
+    _lg(elog::dbg) << "duration = " << val << " s";
     return val;
 }
 
 double Player::timePos() {
-    _lg(log::trace) << "timePos()";
+    _lg(elog::trace) << "timePos()";
     double time;
     checkError(mpv_get_property(_mpv, "time-pos", MPV_FORMAT_DOUBLE, &time));
-    _lg(log::dbg) << "time = " << time << " s";
+    _lg(elog::dbg) << "time = " << time << " s";
     return time;
 }
 
@@ -214,7 +214,7 @@ void Player::run() {
     _lg << "mpv thread created";
     while (_started) {
         mpv_event *evt = mpv_wait_event(_mpv, 10000);
-        _lg(log::dbg) << "mpv event: " << mpv_event_name(evt->event_id);
+        _lg(elog::dbg) << "mpv event: " << mpv_event_name(evt->event_id);
         switch (evt->event_id) {
         case MPV_EVENT_SHUTDOWN: stop();          break;
         case MPV_EVENT_IDLE:     asyncPlayNext(); break;
@@ -228,7 +228,7 @@ void Player::checkError(int status) const {
 }
 
 void Player::asyncPlayNext() {
-    _lg(log::trace) << "asyncPlayNext()";
+    _lg(elog::trace) << "asyncPlayNext()";
     if (!_playMutex.try_lock()) return;
 
     Lock lock{_playMutex, std::adopt_lock};

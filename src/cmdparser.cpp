@@ -5,7 +5,7 @@
 #include "ytnamesolver.hpp"
 #include "config.hpp"
 
-namespace log = ese::log;
+namespace elog = ese::log;
 
 CmdParser::CmdParser(Player & player) : _player{player} {
     _lg.prefix("cmdParser: ");
@@ -26,7 +26,7 @@ std::string CmdParser::apply(std::string const & line) {
     if (cmd == "volume")   return volume(iss);
     if (cmd == "progress") return progress(iss);
 
-    _lg(log::warn) << "unknown command '" << cmd << "'";
+    _lg(elog::warn) << "unknown command '" << cmd << "'";
     return "unknown command '" + cmd + "'\n";
 }
 
@@ -36,14 +36,14 @@ std::string CmdParser::add(std::istringstream & iss) {
 
     if (id.size() < cfg::ytIdSize) {
         std::string err{"Invalid video ID : '" + id};
-        _lg(log::warn) << err;
+        _lg(elog::warn) << err;
         return std::move(err) + "\n";
     }
 
     try {
         id = id.substr(id.size() - cfg::ytIdSize);
         std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
-        _lg(log::dbg) << "video title = \"" << title << '"';
+        _lg(elog::dbg) << "video title = \"" << title << '"';
         _player.add(id, title);
         return "";
     }
@@ -65,7 +65,7 @@ std::string CmdParser::list(std::istringstream & iss) {
     for (auto const & it : *plv) {
         oss << std::setw(3) << i++ << ". [" << it->id();
         oss << "] " << it->title() << std::endl;
-        _lg(log::trace) << "list += [" << it->id() << "] " << it->title();
+        _lg(elog::trace) << "list += [" << it->id() << "] " << it->title();
     }
     return oss.str();
 }
@@ -83,9 +83,9 @@ std::string CmdParser::rm(std::istringstream & iss) {
             auto wm = _player.remove(id);
             if (wm) return "";
         }
-        _lg(log::warn) << "remove failed (id = " << id << ')';
+        _lg(elog::warn) << "remove failed (id = " << id << ')';
     }
-    else _lg(log::warn) << "Remove failed: parsing error";
+    else _lg(elog::warn) << "Remove failed: parsing error";
     return "Remove failed.\n";
 }
 

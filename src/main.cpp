@@ -5,11 +5,11 @@
 #include "cmdparser.hpp"
 #include "eventviewer.hpp"
 
-namespace log = ese::log;
+namespace elog = ese::log;
 
 int main() {
-    log::cfg().logLevel(log::trace);
-    log::Logger l;
+    elog::cfg().logLevel(elog::trace);
+    elog::Logger l;
 
     int port = 1937;
 
@@ -20,7 +20,7 @@ int main() {
     l << "connecting server";
     server.connect();
     server.asyncAcceptLoop([&player, &server] (net::Client const & client) {
-        log::Logger lg;
+        elog::Logger lg;
         lg.prefix(std::string{"client "} + std::to_string(client.id()) + ": ");
         lg << "connected";
 
@@ -39,7 +39,7 @@ int main() {
                 }
             }
             catch (std::exception const & e) {
-                lg(log::err) << e.what();
+                lg(elog::err) << e.what();
             }
         }
 
