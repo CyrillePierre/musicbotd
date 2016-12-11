@@ -25,4 +25,5 @@ private:
     std::string volume(std::istringstream & iss);
     std::string progress(std::istringstream & iss);
     std::string current(std::istringstream & iss);
+    std::string state(std::istringstream & iss);
 };
