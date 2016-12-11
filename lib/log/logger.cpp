@@ -10,7 +10,7 @@ LogEntry Logger::operator () (int lvl) const {
     LogEntry le{lvl};	// locking stream mutex
     if (lvl >= c.logLevel()) {
         if (c.timeEnabled()) addTime();
-        if (lvl < levels.size())
+        if ((std::size_t)lvl < levels.size())
             c.stream() << "[" << levels[lvl] << "] ";
         c.stream() << _prefix;
     }

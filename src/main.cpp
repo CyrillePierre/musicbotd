@@ -41,6 +41,8 @@ int main() {
     using namespace std::placeholders;
 
     elog::cfg().logLevel(elog::trace);
+//    elog::cfg().timeEnabled(true);
+//    elog::cfg().stream("/var/log/musicbotd.log");
     elog::Logger l;
 
     int port = 1937, portAPI = 1938;

@@ -18,14 +18,12 @@ Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
     checkError(mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt));
     checkError(mpv_initialize(_mpv));
 
-    checkError(mpv_request_log_messages(_mpv, "trace"));
+    checkError(mpv_request_log_messages(_mpv, "info"));
 
     _lg << "mpv options:";
     _lg << "  - version = " << mpv_get_property_string(_mpv, "mpv-version");
     _lg << "  - ytdl    = " << mpv_get_property_string(_mpv, "ytdl");
     _lg << "  - video   = " << mpv_get_property_string(_mpv, "video");
-    _lg << "  - volume  = " << mpv_get_property_string(_mpv, "volume");
-    _lg << "  - pause   = " << mpv_get_property_string(_mpv, "pause");
 
 }
 
@@ -189,10 +187,6 @@ std::size_t Player::playlistSize() const {
     return _playlist.size();
 }
 
-bool Player::hasCurrent() {
-
-}
-
 double Player::duration() {
     _lg(elog::trace) << "currentDuration()";
     double val;
@@ -210,24 +204,35 @@ double Player::timePos() {
 }
 
 WebMusic Player::current() {
-
+    _lg(elog::trace) << "current()";
+    std::string id, title;
+    id = mpv_get_property_string(_mpv, "path");
+    title = mpv_get_property_string(_mpv, "media-title");
+    _lg(elog::dbg) << "url = " << id;
+    _lg(elog::dbg) << "media-title = " << title;
+    return WebMusic{id.substr(id.size() - cfg::ytIdSize), title};
 }
 
 void Player::run() {
+    std::string text;
+
     _lg << "mpv thread created";
     while (_started) {
         mpv_event *evt = mpv_wait_event(_mpv, 10000);
-        std::string name{mpv_event_name(evt->event_id)};
-        std::string text;
-        if(name == "log-message") {
-            text = std::string{static_cast<mpv_event_log_message*>(evt->data)->text};
-            text.pop_back();
-        } else
-            text = name;
-        _lg(elog::dbg) << "mpv event: " << text;
+        if (evt->event_id != MPV_EVENT_LOG_MESSAGE)
+            _lg(elog::dbg) << "mpv event: " << mpv_event_name(evt->event_id);
+
         switch (evt->event_id) {
-        case MPV_EVENT_SHUTDOWN: stop();          break;
-        case MPV_EVENT_IDLE:     asyncPlayNext(); break;
+        case MPV_EVENT_SHUTDOWN:    stop();             break;
+        case MPV_EVENT_IDLE:        asyncPlayNext();    break;
+        case MPV_EVENT_END_FILE:	_isPlaying = false; break;
+        case MPV_EVENT_START_FILE:	_isPlaying = true;  break;
+        case MPV_EVENT_LOG_MESSAGE:
+            text = static_cast<mpv_event_log_message*>(evt->data)->text;
+            text.pop_back();
+            _lg(elog::dbg) << "mpv log: " << text;
+            break;
+        default: break;
         }
     }
     _lg << "mpv thread finished";

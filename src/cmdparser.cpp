@@ -25,6 +25,7 @@ std::string CmdParser::apply(std::string const & line) {
     if (cmd == "pause")    return pause(iss);
     if (cmd == "volume")   return volume(iss);
     if (cmd == "progress") return progress(iss);
+    if (cmd == "current")  return current(iss);
 
     _lg(elog::warn) << "unknown command '" << cmd << "'";
     return "unknown command '" + cmd + "'\n";
@@ -108,7 +109,7 @@ std::string CmdParser::volume(std::istringstream & iss) {
     Player::Volume value;
 
     if (iss >> value) {
-        Player::Volume vol = _player.incrVolume(value);
+        _player.incrVolume(value);
         return "";
     }
     return "Volume = " + std::to_string(_player.volume()) + "\n";
@@ -120,5 +121,15 @@ std::string CmdParser::progress(std::istringstream & iss) {
     std::ostringstream oss;
     oss << "Progress: " << time << "s / " << dur << "s (";
     oss << time*100/dur << "%)\n";
+    return oss.str();
+}
+
+std::string CmdParser::current(std::istringstream &) {
+    std::ostringstream oss;
+    if (_player.hasCurrent()) {
+        WebMusic wm{_player.current()};
+        oss << "Current: [" << wm.id() << "] " << wm.title() << '\n';
+    }
+    else oss << "No current music.\n";
     return oss.str();
 }

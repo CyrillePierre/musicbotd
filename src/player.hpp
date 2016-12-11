@@ -68,7 +68,7 @@ public:
     PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;
     void setEventHandler(EventHandler const & eh) { _evtFn = eh; }
-    bool hasCurrent();
+    bool hasCurrent() { return _isPlaying; }
     double duration();
     double timePos();
     WebMusic current();
