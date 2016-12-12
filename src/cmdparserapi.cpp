@@ -71,9 +71,11 @@ std::string CmdParserAPI::rm(std::istringstream & iss) {
         else if (id.size() == cfg::ytIdSize){
             auto wm = _player.remove(id);
             if (wm) json["id"] = id;
-        }
-        _lg(elog::warn) << "remove failed (id = " << id << ')';
-    }
+        } else {
+					json["error"] = "remove failed";
+					_lg(elog::warn) << "remove failed (id = " << id << ')';
+				}
+		}
     else {
         json["error"] = "remove failed";
         _lg(elog::warn) << "Remove failed: parsing error";
