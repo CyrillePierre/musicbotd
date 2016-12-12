@@ -1,19 +1,10 @@
 #pragma once
 
-#include <sstream>
-#include <log/log.hpp>
-#include "ytnamesolver.hpp"
+#include "cmdparserbase.hpp"
 
-class Player;
-
-class CmdParser {
-    Player & _player;
-    YtNameSolver _yt;
-    ese::log::Logger _lg;
-
+class CmdParser: public CmdParserBase<CmdParser> {
 public:
     CmdParser(Player & player);
-    std::string apply(std::string const & cmd);
 
 private:
     std::string add(std::istringstream & iss);
@@ -26,4 +17,6 @@ private:
     std::string progress(std::istringstream & iss);
     std::string current(std::istringstream & iss);
     std::string state(std::istringstream & iss);
+
+		friend CmdParserBase<CmdParser>;
 };

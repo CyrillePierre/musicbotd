@@ -7,29 +7,8 @@
 
 namespace elog = ese::log;
 
-CmdParser::CmdParser(Player & player) : _player{player} {
+CmdParser::CmdParser(Player & player) : CmdParserBase{player} {
     _lg.prefix("cmdParser: ");
-}
-
-std::string CmdParser::apply(std::string const & line) {
-    std::istringstream iss(line);
-    std::string cmd;
-
-    iss >> cmd;
-
-    if (cmd == "add")      return add(iss);
-    if (cmd == "list")     return list(iss);
-    if (cmd == "rm")       return rm(iss);
-    if (cmd == "clear")    return clear(iss);
-    if (cmd == "next")     return next(iss);
-    if (cmd == "pause")    return pause(iss);
-    if (cmd == "volume")   return volume(iss);
-    if (cmd == "progress") return progress(iss);
-    if (cmd == "current")  return current(iss);
-    if (cmd == "state")    return state(iss);
-
-    _lg(elog::warn) << "unknown command '" << cmd << "'";
-    return "unknown command '" + cmd + "'\n";
 }
 
 std::string CmdParser::add(std::istringstream & iss) {

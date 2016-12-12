@@ -8,27 +8,8 @@
 
 namespace elog = ese::log;
 
-CmdParserAPI::CmdParserAPI(Player & player) : _player{player} {
-    _lg.prefix("cmdParser: ");
-}
-
-std::string CmdParserAPI::apply(std::string const & line) {
-    std::istringstream iss(line);
-    std::string cmd;
-
-    iss >> cmd;
-
-    if (cmd == "add")      return add(iss);
-    if (cmd == "list")     return list(iss);
-    if (cmd == "rm")       return rm(iss);
-    if (cmd == "clear")    return clear(iss);
-    if (cmd == "next")     return next(iss);
-    if (cmd == "pause")    return pause(iss);
-    if (cmd == "volume")   return volume(iss);
-    if (cmd == "progress") return progress(iss);
-
-    _lg(elog::warn) << "unknown command '" << cmd << "'";
-    return "unknown command '" + cmd + "'\n";
+CmdParserAPI::CmdParserAPI(Player & player) : CmdParserBase{player} {
+    _lg.prefix("cmdParserAPI: ");
 }
 
 std::string CmdParserAPI::add(std::istringstream & iss) {
@@ -138,4 +119,22 @@ std::string CmdParserAPI::progress(std::istringstream & iss) {
     json["current"] = _player.timePos();
     json["total"] = _player.duration();
     return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::current(std::istringstream &) {
+		nlohmann::json json;
+		if (_player.hasCurrent()) {
+				WebMusic wm{_player.current()};
+				json["id"] = wm.id();
+				json["title"] = wm.title();
+		} else
+				json["message"] = "No current music";
+		return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::state(std::istringstream &) {
+		nlohmann::json json;
+		json["hasCurrent"] = _player.hasCurrent();
+		json["paused"] = _player.isPaused();
+		return json.dump() + "\n";
 }
