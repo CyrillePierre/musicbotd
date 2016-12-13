@@ -15,14 +15,14 @@
 
 void net::Server::connect()
 {
-		int tr = 1;
+    int tr = 1;
     struct sockaddr_in addr;
 
     /* Création de la socket */
     ERROR_IF((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1);
 
-		/* Avoid "address already in use" */
-		ERROR_IF(setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &tr, sizeof(int)) == -1);
+    /* Avoid "address already in use" */
+    ERROR_IF(setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &tr, sizeof(int)) == -1);
  
     /* Initialisation de l'adresse */
     addr.sin_family		 = AF_INET;
