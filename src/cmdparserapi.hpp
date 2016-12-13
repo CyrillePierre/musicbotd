@@ -15,8 +15,9 @@ private:
     std::string pause(std::istringstream & iss);
     std::string volume(std::istringstream & iss);
     std::string progress(std::istringstream & iss);
-		std::string current(std::istringstream & iss);
-		std::string state(std::istringstream & iss);
+    std::string current(std::istringstream & iss);
+    std::string state(std::istringstream & iss);
+    std::string random(std::istringstream & iss);
 
-		friend CmdParserBase<CmdParserAPI>;
+    friend CmdParserBase<CmdParserAPI>;
 };

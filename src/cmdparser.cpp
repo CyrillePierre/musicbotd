@@ -121,3 +121,8 @@ std::string CmdParser::state(std::istringstream &) {
     oss << ", isPaused=" << _player.isPaused() << '\n';
     return oss.str();
 }
+
+std::string CmdParser::random(std::istringstream &) {
+    _player.addRandom();
+    return "";
+}

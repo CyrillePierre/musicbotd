@@ -136,5 +136,17 @@ std::string CmdParserAPI::state(std::istringstream &) {
 		nlohmann::json json;
 		json["hasCurrent"] = _player.hasCurrent();
 		json["paused"] = _player.isPaused();
-		return json.dump() + "\n";
+        return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::random(std::istringstream &) {
+    nlohmann::json json;
+    auto wm = _player.addRandom();
+    if (wm) {
+        json["id"] = wm->id();
+        json["title"] = wm->title();
+    } else
+        json["error"] = "Archive is empty";
+
+    return json.dump() + "\n";
 }

@@ -17,6 +17,7 @@ private:
     std::string progress(std::istringstream & iss);
     std::string current(std::istringstream & iss);
     std::string state(std::istringstream & iss);
+    std::string random(std::istringstream & iss);
 
-		friend CmdParserBase<CmdParser>;
+    friend CmdParserBase<CmdParser>;
 };

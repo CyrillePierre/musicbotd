@@ -10,8 +10,9 @@
 #include <util/optional.hpp>
 #include <util/any.hpp>
 #include <log/log.hpp>
+#include <mpv/client.h>
 #include "webmusic.hpp"
-#include "mpv/client.h"
+#include "archive.hpp"
 
 enum PlayerEvt {
     added = 0,
@@ -34,6 +35,7 @@ struct Player {
 
 private:
     Playlist                _playlist;
+    Archive &               _archive;
     bool	                _pause;
     bool                    _started;
     bool					_isPlaying;
@@ -47,11 +49,12 @@ private:
     EventHandler			_evtFn;
 
 public:
-    Player();
+    Player(Archive & archive);
     ~Player();
 
     void add(std::string const & id, std::string const & name);
     void add(WebMusic const & m);
+    util::Optional<WebMusic> addRandom();
     void remove(Playlist::const_iterator it);
     util::Optional<WebMusic> remove(std::string const & id);
     util::Optional<WebMusic> remove(std::size_t index);
