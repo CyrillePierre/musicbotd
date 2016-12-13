@@ -30,6 +30,7 @@ public:
     LogStream & operator = (LogStream<T> && ls) {
         std::swap(ls._file, _file);
         _os = ls._os;
+        return *this;
     }
 
     Stream & stream() {

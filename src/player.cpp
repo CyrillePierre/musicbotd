@@ -6,7 +6,9 @@
 
 namespace elog = ese::log;
 
-Player::Player() : _pause{false}, _started{false}, _isPlaying{false} {
+Player::Player(Archive & archive)
+    : _archive{archive}, _pause{false}, _started{false}, _isPlaying{false}
+{
     _lg.prefix("player: ");
 
     _mpv = mpv_create();
@@ -41,7 +43,9 @@ void Player::add(std::string const & id, std::string const & name) {
     _lg(elog::trace) << "add(" << id << ", " << name << ')';
     _mutex.lock();
     _plv.clear();
-    _playlist.push_back(WebMusic{id, name});
+    WebMusic wm{id, name};
+    _archive.add(wm);
+    _playlist.push_back(std::move(wm));
     _mutex.unlock();
     sendEvent(PlayerEvt::added, _playlist.back());
     _cv.notify_one();
@@ -55,6 +59,20 @@ void Player::add(const WebMusic &m) {
     _mutex.unlock();
     _cv.notify_one();
     sendEvent(PlayerEvt::added, _playlist.back());
+}
+
+util::Optional<WebMusic> Player::addRandom() {
+    _lg(elog::trace) << "addRandom()";
+    if (!_archive.empty()) {
+        _mutex.lock();
+        util::Optional<WebMusic> wm{_archive.random()};
+        _mutex.unlock();
+        _playlist.push_back(wm);
+        sendEvent(PlayerEvt::added, _playlist.back());
+        _cv.notify_one();
+        return wm;
+    }
+    return util::Optional<WebMusic>{};
 }
 
 void Player::remove(Playlist::const_iterator it) {
