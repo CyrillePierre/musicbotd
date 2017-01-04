@@ -9,7 +9,7 @@
 
 namespace elog = ese::log;
 
-template<typename Parser>
+template<typename Parser, elog::LogLevel lglvl>
 void applyFunction(Player & player, net::Client const & client) {
 	elog::Logger lg;
 	lg.prefix(std::string{"client "} + std::to_string(client.id()) + ": ");
@@ -22,10 +22,10 @@ void applyFunction(Player & player, net::Client const & client) {
 		try {
 			buf[--nbRead] = 0;
 			std::string line(buf);
-			lg << "cmd '" << line << "'";
+            lg(lglvl) << "cmd '" << line << "'";
 			std::string res{parser.apply(line)};
 			if (!res.empty()) {
-				lg << "write " << res.size() << " bytes";
+                lg(lglvl) << "write " << res.size() << " bytes";
 				client.write(res.c_str(), res.size());
 			}
 		}
@@ -40,10 +40,11 @@ void applyFunction(Player & player, net::Client const & client) {
 int main() {
 	using namespace std::placeholders;
 
-	elog::cfg().logLevel(elog::trace);
-	//		elog::cfg().timeEnabled(true);
-	//		elog::cfg().stream("/var/log/musicbotd.log");
-	elog::Logger l;
+    elog::cfg().logLevel(elog::trace);
+//    elog::cfg().logLevel(elog::msg);
+//    elog::cfg().timeEnabled(true);
+//    elog::cfg().stream("/var/log/musicbotd.log");
+    elog::Logger l;
 
 	int port = 1937, portAPI = 1938;
 
@@ -57,8 +58,10 @@ int main() {
 	server.connect();
 	serverAPI.connect();
 
-	server.asyncAcceptLoop(std::bind(applyFunction<CmdParser>, std::ref(player), _1));
-	serverAPI.asyncAcceptLoop(std::bind(applyFunction<CmdParserAPI>, std::ref(player), _1));
+    server.asyncAcceptLoop(std::bind(
+        applyFunction<CmdParser, elog::msg>, std::ref(player), _1));
+    serverAPI.asyncAcceptLoop(std::bind(
+        applyFunction<CmdParserAPI, elog::dbg>, std::ref(player), _1));
 
 	l << "starting player";
 	player.setEventHandler([&] (PlayerEvt evt, util::Any any) {
