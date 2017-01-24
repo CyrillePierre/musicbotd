@@ -64,10 +64,10 @@ void Player::add(const WebMusic &m) {
 util::Optional<WebMusic> Player::addRandom() {
     _lg(elog::trace) << "addRandom()";
     if (!_archive.empty()) {
-        _mutex.lock();
         util::Optional<WebMusic> wm{_archive.random()};
-        _mutex.unlock();
+        _mutex.lock();
         _playlist.push_back(wm);
+        _mutex.unlock();
         sendEvent(PlayerEvt::added, _playlist.back());
         _cv.notify_one();
         return wm;
