@@ -26,7 +26,9 @@ std::string CmdParserAPI::add(std::istringstream & iss) {
 			id = id.substr(id.size() - cfg::ytIdSize);
 			std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
 			_lg(elog::dbg) << "video title = \"" << title << '"';
-			_player.add(id, title);
+			WebMusic wm{id, title};
+			if(_archive) _archive->add(wm);
+			_player.add(wm);
 			return "";
 		}
 		catch (UnknownVideo const & e) {
@@ -142,6 +144,7 @@ std::string CmdParserAPI::state(std::istringstream &) {
 }
 
 std::string CmdParserAPI::random(std::istringstream &) {
-	_player.addRandom();
+	if(_archive && !_archive->empty()) _player.add(_archive->random());
+	else _player.addRandom();
 	return "";
 }
