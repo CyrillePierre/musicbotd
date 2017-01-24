@@ -8,7 +8,7 @@
 
 namespace elog = ese::log;
 
-CmdParserAPI::CmdParserAPI(Player & player) : CmdParserBase{player} {
+CmdParserAPI::CmdParserAPI(Player & player, ArchiveMgr & archivemgr) : CmdParserBase{player, archivemgr} {
 	_lg.prefix("cmdParserAPI: ");
 }
 
@@ -146,5 +146,18 @@ std::string CmdParserAPI::state(std::istringstream &) {
 std::string CmdParserAPI::random(std::istringstream &) {
 	if(_archive && !_archive->empty()) _player.add(_archive->random());
 	else _player.addRandom();
+	return "";
+}
+
+std::string CmdParserAPI::pl(std::istringstream & iss) {
+	std::string fn;
+	iss >> fn;
+	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive = _archivemgr.load(fn);
+	return "";
+}
+
+std::string CmdParserAPI::plquit(std::istringstream &) {
+	if(_archive) _archivemgr.unload(std::move(_archive));
 	return "";
 }

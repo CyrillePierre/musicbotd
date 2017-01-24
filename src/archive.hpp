@@ -32,7 +32,7 @@ private:
     mutable std::mutex _musicsMutex;
 
 public:
-    Archive(std::string filename);
+    Archive(std::string const & filename);
     ~Archive();
     void add(WebMusic const & wm);
     WebMusic operator [] (std::string const &) const;

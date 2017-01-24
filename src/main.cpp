@@ -6,17 +6,18 @@
 #include "cmdparser.hpp"
 #include "cmdparserapi.hpp"
 #include "eventviewer.hpp"
+#include "archivemgr.hpp"
 
 namespace elog = ese::log;
 
 template<typename Parser, elog::LogLevel lglvl>
-void applyFunction(Player & player, net::Client const & client) {
+void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const & client) {
 	elog::Logger lg;
 	lg.prefix(std::string{"client "} + std::to_string(client.id()) + ": ");
 	lg << "connected";
 
 	char buf[128];
-	Parser parser{player};
+	Parser parser{player, archivemgr};
 
 	while (std::size_t nbRead = client.read(buf, 128)) {
 		try {
@@ -40,14 +41,15 @@ void applyFunction(Player & player, net::Client const & client) {
 int main() {
 	using namespace std::placeholders;
 
-    elog::cfg().logLevel(elog::trace);
+	elog::cfg().logLevel(elog::trace);
 //    elog::cfg().logLevel(elog::msg);
 //    elog::cfg().timeEnabled(true);
 //    elog::cfg().stream("/var/log/musicbotd.log");
-    elog::Logger l;
+	elog::Logger l;
 
 	int port = 1937, portAPI = 1938;
 
+	ArchiveMgr archivemgr;
 	Archive archive{"archive"};
 	Player player{archive};
 	net::Server server{port}, serverAPI{portAPI};
@@ -58,10 +60,10 @@ int main() {
 	server.connect();
 	serverAPI.connect();
 
-    server.asyncAcceptLoop(std::bind(
-        applyFunction<CmdParser, elog::msg>, std::ref(player), _1));
-    serverAPI.asyncAcceptLoop(std::bind(
-        applyFunction<CmdParserAPI, elog::dbg>, std::ref(player), _1));
+	server.asyncAcceptLoop(std::bind(
+		applyFunction<CmdParser, elog::msg>, std::ref(player), std::ref(archivemgr), _1));
+	serverAPI.asyncAcceptLoop(std::bind(
+		applyFunction<CmdParserAPI, elog::dbg>, std::ref(player), std::ref(archivemgr), _1));
 
 	l << "starting player";
 	player.setEventHandler([&] (PlayerEvt evt, util::Any any) {

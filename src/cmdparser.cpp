@@ -7,7 +7,7 @@
 
 namespace elog = ese::log;
 
-CmdParser::CmdParser(Player & player) : CmdParserBase{player} {
+CmdParser::CmdParser(Player & player, ArchiveMgr & archivemgr) : CmdParserBase{player, archivemgr} {
     _lg.prefix("cmdParser: ");
 }
 
@@ -128,4 +128,17 @@ std::string CmdParser::random(std::istringstream &) {
 		if(_archive && !_archive->empty()) _player.add(_archive->random());
     else _player.addRandom();
     return "";
+}
+
+std::string CmdParser::pl(std::istringstream & iss) {
+	std::string fn;
+	iss >> fn;
+	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive = _archivemgr.load(fn);
+	return "Entering playlist: "+fn+"\n";
+}
+
+std::string CmdParser::plquit(std::istringstream &) {
+	if(_archive) _archivemgr.unload(std::move(_archive));
+	return "Entering default playlist\n";
 }
