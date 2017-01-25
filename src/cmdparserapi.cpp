@@ -176,12 +176,14 @@ std::string CmdParserAPI::plquit(std::istringstream &) {
 	nlohmann::json json;
 	json["event"] = 19;
 	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive.reset();
 	return json.dump() + "\n";
 }
 
 std::string CmdParserAPI::pllist(std::istringstream & iss) {
     auto playlists = _archivemgr.list();
     nlohmann::json json;
+		json["event"] = 12;
     json["value"] = nlohmann::json::array();
     for (auto const & elem : playlists)
         json["value"] += elem;
