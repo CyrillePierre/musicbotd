@@ -159,5 +159,14 @@ std::string CmdParserAPI::pl(std::istringstream & iss) {
 
 std::string CmdParserAPI::plquit(std::istringstream &) {
 	if(_archive) _archivemgr.unload(std::move(_archive));
-	return "";
+    return "";
+}
+
+std::string CmdParserAPI::pllist(std::istringstream & iss) {
+    auto playlists = _archivemgr.list();
+    nlohmann::json json;
+    json["value"] = nlohmann::json::array();
+    for (auto const & elem : playlists)
+        json["value"] += elem;
+    return json.dump() + "\n";
 }

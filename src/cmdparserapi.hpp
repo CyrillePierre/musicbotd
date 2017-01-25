@@ -20,6 +20,7 @@ private:
     std::string random(std::istringstream & iss);
     std::string pl(std::istringstream & iss);
     std::string plquit(std::istringstream & iss);
+    std::string pllist(std::istringstream & iss);
 
     friend CmdParserBase<CmdParserAPI>;
 };
