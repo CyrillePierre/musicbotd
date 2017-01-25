@@ -172,6 +172,7 @@ std::string CmdParserAPI::plquit(std::istringstream &) {
 	nlohmann::json json;
 	json["event"] = 19;
 	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive.reset();
 	return json.dump() + "\n";
 }
 

@@ -145,7 +145,8 @@ std::string CmdParser::plcur(std::istringstream & iss) {
 
 std::string CmdParser::plquit(std::istringstream &) {
 	if(_archive) _archivemgr.unload(std::move(_archive));
-    return "Entering default playlist\n";
+	_archive.reset();
+	return "Entering default playlist\n";
 }
 
 std::string CmdParser::pllist(std::istringstream &) {
