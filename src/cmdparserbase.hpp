@@ -48,6 +48,7 @@ public:
 	if (cmd == "plcur")     return _this->plcur(iss);
 	if (cmd == "plquit")    return _this->plquit(iss);
 	if (cmd == "help")      return help(iss);
+    if (cmd == "pllist")    return _this->pllist(iss);
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
 		return "unknown command '" + cmd + "'\n";

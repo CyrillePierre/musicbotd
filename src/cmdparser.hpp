@@ -21,6 +21,7 @@ private:
     std::string pl(std::istringstream & iss);
     std::string plcur(std::istringstream & iss);
     std::string plquit(std::istringstream & iss);
+    std::string pllist(std::istringstream & iss);
 
     friend CmdParserBase<CmdParser>;
 };
