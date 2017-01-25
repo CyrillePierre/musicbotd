@@ -138,6 +138,11 @@ std::string CmdParser::pl(std::istringstream & iss) {
 	return "Entering playlist: "+fn+"\n";
 }
 
+std::string CmdParser::plcur(std::istringstream & iss) {
+	if(_archive) return _archive->name() + "\n";
+	return "~\n";
+}
+
 std::string CmdParser::plquit(std::istringstream &) {
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	return "Entering default playlist\n";

@@ -45,6 +45,7 @@ public:
     if (cmd == "state")     return _this->state(iss);
     if (cmd == "random")    return _this->random(iss);
 	if (cmd == "pl")        return _this->pl(iss);
+	if (cmd == "plcur")     return _this->plcur(iss);
 	if (cmd == "plquit")    return _this->plquit(iss);
 	if (cmd == "help")      return help(iss);
 
@@ -62,6 +63,9 @@ private:
  pause             Pause the current music.
  list [<N>]        List the <N> next videos (all videos if <N> is omitted).
  random            Randomly select a music in archive file.
+ pl                Enter a playlist
+ plcur             Display the current playlist
+ plquit            Enter the global playlist
  clear             Remove all the playlist.
  state             Show the current states of the player
  progress          Show the current position in the current music

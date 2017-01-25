@@ -150,14 +150,27 @@ std::string CmdParserAPI::random(std::istringstream &) {
 }
 
 std::string CmdParserAPI::pl(std::istringstream & iss) {
+	nlohmann::json json;
+	json["event"] = 10;
 	std::string fn;
 	iss >> fn;
+	json["value"] = fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive = _archivemgr.load(fn);
-	return "";
+	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::plcur(std::istringstream &) {
+	nlohmann::json json;
+	json["event"] = 11;
+	if(_archive) json["value"] = _archive->name();
+	else         json["value"] = "~";
+	return json.dump() + "\n";
 }
 
 std::string CmdParserAPI::plquit(std::istringstream &) {
+	nlohmann::json json;
+	json["event"] = 19;
 	if(_archive) _archivemgr.unload(std::move(_archive));
-	return "";
+	return json.dump() + "\n";
 }

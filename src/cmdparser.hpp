@@ -19,6 +19,7 @@ private:
     std::string state(std::istringstream & iss);
     std::string random(std::istringstream & iss);
     std::string pl(std::istringstream & iss);
+    std::string plcur(std::istringstream & iss);
     std::string plquit(std::istringstream & iss);
 
     friend CmdParserBase<CmdParser>;

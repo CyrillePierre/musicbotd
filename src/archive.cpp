@@ -10,8 +10,8 @@ namespace elog = ese::log;
 
 constexpr std::chrono::seconds Archive::syncTime;
 
-Archive::Archive(std::string const & filename)
-    : _filename(filename), _changed{false}, _started{true}
+Archive::Archive(std::string const & filename, std::string const & name)
+    : _filename(filename), _name(name), _changed{false}, _started{true}
 {
     _lg.prefix("archive: ");
     _lg(elog::dbg) << "Archive(" << filename << ")";
