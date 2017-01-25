@@ -44,10 +44,28 @@ public:
     if (cmd == "current")   return _this->current(iss);
     if (cmd == "state")     return _this->state(iss);
     if (cmd == "random")    return _this->random(iss);
-		if (cmd == "pl")        return _this->pl(iss);
-		if (cmd == "plquit")		return _this->plquit(iss);
+	if (cmd == "pl")        return _this->pl(iss);
+	if (cmd == "plquit")    return _this->plquit(iss);
+	if (cmd == "help")      return help(iss);
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
 		return "unknown command '" + cmd + "'\n";
 	}
+
+private:
+    std::string help(std::istringstream &) {
+        return R"#(Available commands:
+ add (<id>|<url>)  Add a video ID or URL of youtube video in the playlist.
+ rm (<index>|<id>) Remove a video by ID or index of youtube video in the playlist.
+ next              Pass to the next music.
+ vol <value>       Increment the volume with the corresponding <value> (in %).
+ pause             Pause the current music.
+ list [<N>]        List the <N> next videos (all videos if <N> is omitted).
+ random            Randomly select a music in archive file.
+ clear             Remove all the playlist.
+ state             Show the current states of the player
+ progress          Show the current position in the current music
+ current           Show the current video name
+)#";
+    }
 };

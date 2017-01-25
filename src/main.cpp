@@ -51,6 +51,7 @@ int main() {
 
 	ArchiveMgr archivemgr;
 	Archive archive{"archive"};
+
 	Player player{archive};
 	net::Server server{port}, serverAPI{portAPI};
 
@@ -78,8 +79,8 @@ int main() {
 
 	player.start();
 
-	std::cin.get();
-	//	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
+//	std::cin.get();
+	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
 
 	l << "disconnecting server";
 	server.disconnect();
