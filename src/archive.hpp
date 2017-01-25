@@ -15,7 +15,7 @@ struct Archive {
     using Lock = std::unique_lock<std::mutex>;
     using Cv   = std::condition_variable;
 
-    static constexpr std::chrono::seconds syncTime{60};
+    static constexpr std::chrono::seconds syncTime{10};
 
 private:
     std::string  _filename;

@@ -2,7 +2,9 @@
 #include <boost/filesystem.hpp>
 
 ArchiveMgr::ArchivePtr ArchiveMgr::load(std::string const & fn) {
-	if(!_archives.count(fn))
+    if (fn.find('/') != std::string::npos) return ArchivePtr{};
+    if (fn.find('~') != std::string::npos) return ArchivePtr{};
+    if(!_archives.count(fn))
 		_archives[fn] = std::make_shared<Archive>(_wd+"/"+fn, fn);
 	return _archives[fn];
 }

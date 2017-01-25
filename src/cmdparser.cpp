@@ -135,7 +135,8 @@ std::string CmdParser::pl(std::istringstream & iss) {
 	iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive = _archivemgr.load(fn);
-	return "Entering playlist: "+fn+"\n";
+    if (_archive) return "Entering playlist: "+fn+"\n";
+    return "Invalid playlist name.\n";
 }
 
 std::string CmdParser::plcur(std::istringstream & iss) {
