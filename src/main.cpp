@@ -47,7 +47,7 @@ int main() {
 //    elog::cfg().stream("/var/log/musicbotd.log");
 	elog::Logger l;
 
-	int port = 1937, portAPI = 1938;
+    int port = 1939, portAPI = 1940;
 
 	ArchiveMgr archivemgr;
 	Archive archive{"archive"};

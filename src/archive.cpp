@@ -98,8 +98,8 @@ void Archive::syncRoutine() {
         }
         else _lg(elog::trace) << "wake: nothing to do";
 
-        for (auto const & m : _musics)
-            _lg(elog::dbg) << "map : [" << m.first << "] '" << m.second << "'";
+//        for (auto const & m : _musics)
+//            _lg(elog::dbg) << "map : [" << m.first << "] '" << m.second << "'";
     }
 
     _lg << "thread finished.";
