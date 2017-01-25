@@ -4,7 +4,7 @@
 
 class CmdParser: public CmdParserBase<CmdParser> {
 public:
-    CmdParser(Player & player);
+    CmdParser(Player & player, ArchiveMgr & archivemgr);
 
 private:
     std::string add(std::istringstream & iss);
@@ -18,6 +18,10 @@ private:
     std::string current(std::istringstream & iss);
     std::string state(std::istringstream & iss);
     std::string random(std::istringstream & iss);
+    std::string pl(std::istringstream & iss);
+    std::string plcur(std::istringstream & iss);
+    std::string plquit(std::istringstream & iss);
+    std::string pllist(std::istringstream & iss);
 
     friend CmdParserBase<CmdParser>;
 };

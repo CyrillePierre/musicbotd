@@ -15,10 +15,11 @@ struct Archive {
     using Lock = std::unique_lock<std::mutex>;
     using Cv   = std::condition_variable;
 
-    static constexpr std::chrono::seconds syncTime{60};
+    static constexpr std::chrono::seconds syncTime{20};
 
 private:
     std::string  _filename;
+		std::string  _name;
     Musics       _musics;
     bool         _changed;
     bool         _started;
@@ -32,13 +33,15 @@ private:
     mutable std::mutex _musicsMutex;
 
 public:
-    Archive(std::string filename);
+    Archive(std::string const & filename, std::string const & name = "~");
     ~Archive();
     void add(WebMusic const & wm);
     WebMusic operator [] (std::string const &) const;
     std::size_t size() const noexcept { return _musics.size(); }
     WebMusic random() const;
     bool empty() const noexcept { return _musics.empty(); }
+
+	std::string const & name() const { return _name; }
 
 private:
     void flush();
