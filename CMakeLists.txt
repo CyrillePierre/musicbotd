@@ -10,6 +10,7 @@ endif()
 set(CMAKE_MODULE_PATH cmake)
 set(CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib/x86_64-linux-gnu/)
 find_package(CURL REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 # lib log
 file(GLOB_RECURSE log_sources lib/log/*.cpp)
@@ -24,8 +25,10 @@ include_directories(lib)
 # main program
 file(GLOB_RECURSE source_files src/*.cpp)
 add_executable(${PROJECT_NAME} ${source_files})
+target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME}
 	${CURL_LIBRARIES}
+	${Boost_LIBRARIES}
 	pthread
 	mpv
 	log
