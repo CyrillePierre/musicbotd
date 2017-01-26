@@ -19,7 +19,7 @@ struct Archive {
 
 private:
     std::string  _filename;
-		std::string  _name;
+    std::string  _name;
     Musics       _musics;
     bool         _changed;
     bool         _started;

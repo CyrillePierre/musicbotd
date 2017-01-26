@@ -158,19 +158,20 @@ void Player::togglePause() {
     checkError(mpv_get_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
     _lg(elog::dbg) << "current pause state = " << pauseState;
     pauseState = !pauseState;
-    checkError(mpv_set_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
+    checkError(mpv_set_property_async(_mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState));
     _lg << "pause state = " << pauseState;
     _pause = pauseState;
-    sendEvent(PlayerEvt::paused, _pause);
+		sendEvent(PlayerEvt::paused, _pause);
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
     _lg(elog::trace) << "incrVolume(" << v << ')';
     Player::Volume vol = volume();
     vol += v;
-    checkError(mpv_set_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
-    checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
-    sendEvent(PlayerEvt::volumeChanged, vol);
+		if(vol < 0)   vol = 0;
+		if(vol > 150) vol = 150;
+    checkError(mpv_set_property_async(_mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol));
+		sendEvent(PlayerEvt::volumeChanged, vol);
     return vol;
 }
 
