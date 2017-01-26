@@ -79,8 +79,8 @@ int main() try {
 
 	player.start();
 
-//	std::cin.get();
-	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
+    std::cin.get();
+//	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
 
 	l << "disconnecting server";
 	server.disconnect();

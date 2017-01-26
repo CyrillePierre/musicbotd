@@ -22,13 +22,13 @@ Player::Player(Archive & archive)
 
 	_lg(elog::dbg) << "Set ytdl property";
     if ((status = mpv_set_property(_mpv, "ytdl", MPV_FORMAT_FLAG, &opt)) < 0)
-		_lg(elog::err) << "failed: " << mpv_error_string(status);
+        _lg(elog::err) << "failed: " << mpv_error_string(status);
 
     opt = 0;
 
 	_lg(elog::dbg) << "Set video property";
     if ((status = mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt)) < 0)
-		_lg(elog::err) << "failed: " << mpv_error_string(status);
+        _lg(elog::err) << "failed: " << mpv_error_string(status);
 
 	_lg(elog::dbg) << "Request info property";
     checkError(mpv_request_log_messages(_mpv, "info"));
@@ -219,7 +219,8 @@ std::size_t Player::playlistSize() const {
 }
 
 double Player::duration() {
-    _lg(elog::trace) << "currentDuration()";
+    _lg(elog::trace) << "duration()";
+    if (!_isPlaying) return 0./0.;
     double val;
     checkError(mpv_get_property(_mpv, "duration", MPV_FORMAT_DOUBLE, &val));
     _lg(elog::dbg) << "duration = " << val << " s";
@@ -228,6 +229,7 @@ double Player::duration() {
 
 double Player::timePos() {
     _lg(elog::trace) << "timePos()";
+    if (!_isPlaying) return 0./0.;
     double time;
     checkError(mpv_get_property(_mpv, "time-pos", MPV_FORMAT_DOUBLE, &time));
     _lg(elog::dbg) << "time = " << time << " s";
@@ -284,6 +286,7 @@ void Player::asyncPlayNext() {
         {
             Lock lock{_mutex};
             _cv.wait(lock, [this] { return !_playlist.empty() || !_started; });
+            _lg(elog::dbg) << "playlist thread waked up";
             if (!_started) return;
             currentMusic = _playlist.front();
             _playlist.pop_front();
