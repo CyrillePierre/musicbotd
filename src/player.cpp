@@ -170,8 +170,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
     vol += v;
 		if(vol < 0)   vol = 0;
 		if(vol > 150) vol = 150;
-    checkError(mpv_set_property_async(_mpv, 0, "volume", MPV_FORMAT_DOUBLE, &vol));
-    sendEvent(PlayerEvt::volumeChanged, vol);
+    checkError(mpv_set_property_async(_mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol));
     return vol;
 }
 
