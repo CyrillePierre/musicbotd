@@ -161,6 +161,7 @@ void Player::togglePause() {
     checkError(mpv_set_property_async(_mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState));
     _lg << "pause state = " << pauseState;
     _pause = pauseState;
+		sendEvent(PlayerEvt::paused, _pause);
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
@@ -170,6 +171,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
 		if(vol < 0)   vol = 0;
 		if(vol > 150) vol = 150;
     checkError(mpv_set_property_async(_mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol));
+		sendEvent(PlayerEvt::volumeChanged, vol);
     return vol;
 }
 
@@ -250,25 +252,10 @@ void Player::run() {
             text.pop_back();
             _lg(elog::dbg) << "mpv log: " << text;
             break;
-
-        case MPV_EVENT_SET_PROPERTY_REPLY:
-            eventAsync(evt->reply_userdata, evt->data);
-            break;
         default: break;
         }
     }
     _lg << "mpv thread finished";
-}
-
-void Player::eventAsync(std::uint64_t userdata, void * data) {
-    switch (userdata) {
-    case PlayerEvt::paused:
-        sendEvent(static_cast<PlayerEvt>(userdata), *static_cast<int *>(data)); break;
-    case PlayerEvt::volumeChanged:
-        sendEvent(static_cast<PlayerEvt>(userdata), *static_cast<double *>(data)); break;
-    default:
-        _lg(elog::warn) << "event async: unknown event ID: " << userdata;
-    }
 }
 
 void Player::checkError(int status) const {
