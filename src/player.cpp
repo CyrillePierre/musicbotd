@@ -14,12 +14,23 @@ Player::Player(Archive & archive)
     _mpv = mpv_create();
     if (!_mpv) std::runtime_error("libmpv: create context failed");
 
-    int opt = 1;
-    checkError(mpv_set_property(_mpv, "ytdl", MPV_FORMAT_FLAG, &opt));
-    opt = 0;
-    checkError(mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt));
+	_lg(elog::dbg) << "initializing mpv";
     checkError(mpv_initialize(_mpv));
 
+	int status;
+    int opt = 1;
+
+	_lg(elog::dbg) << "Set ytdl property";
+    if ((status = mpv_set_property(_mpv, "ytdl", MPV_FORMAT_FLAG, &opt)) < 0)
+		_lg(elog::err) << "failed: " << mpv_error_string(status);
+
+    opt = 0;
+
+	_lg(elog::dbg) << "Set video property";
+    if ((status = mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt)) < 0)
+		_lg(elog::err) << "failed: " << mpv_error_string(status);
+
+	_lg(elog::dbg) << "Request info property";
     checkError(mpv_request_log_messages(_mpv, "info"));
 
     _lg << "mpv options:";
@@ -259,7 +270,7 @@ void Player::run() {
 }
 
 void Player::checkError(int status) const {
-    if (status < 0) std::runtime_error(mpv_error_string(status));
+    if (status < 0) throw std::runtime_error(mpv_error_string(status));
 }
 
 void Player::asyncPlayNext() {
