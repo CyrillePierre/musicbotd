@@ -78,6 +78,7 @@ public:
 
 private:
     void run();
+    void eventAsync(std::uint64_t userdata, void * data);
     void checkError(int status) const;
     void asyncPlayNext();
     void sendEvent(PlayerEvt pe, util::Any && any = util::Any{});
