@@ -64,13 +64,14 @@ private:
  pause             Pause the current music.
  list [<N>]        List the <N> next videos (all videos if <N> is omitted).
  random            Randomly select a music in archive file.
- pl                Enter a playlist
- plcur             Display the current playlist
- plquit            Enter the global playlist
+ pl <name>         Enter in the playlist <name>.
+ plcur             Display the current playlist.
+ plquit            Enter the global playlist.
+ pllist            List all existing playlists.
  clear             Remove all the playlist.
- state             Show the current states of the player
- progress          Show the current position in the current music
- current           Show the current video name
+ state             Show the current states of the player.
+ progress          Show the current position in the current music.
+ current           Show the current video name.
 )#";
     }
 };

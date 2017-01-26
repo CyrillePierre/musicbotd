@@ -250,10 +250,25 @@ void Player::run() {
             text.pop_back();
             _lg(elog::dbg) << "mpv log: " << text;
             break;
+
+        case MPV_EVENT_SET_PROPERTY_REPLY:
+            eventAsync(evt->reply_userdata, evt->data);
+            break;
         default: break;
         }
     }
     _lg << "mpv thread finished";
+}
+
+void Player::eventAsync(std::uint64_t userdata, void * data) {
+    switch (userdata) {
+    case PlayerEvt::paused:
+        sendEvent(static_cast<PlayerEvt>(userdata), *static_cast<int *>(data)); break;
+    case PlayerEvt::volumeChanged:
+        sendEvent(static_cast<PlayerEvt>(userdata), *static_cast<double *>(data)); break;
+    default:
+        _lg(elog::warn) << "event async: unknown event ID: " << userdata;
+    }
 }
 
 void Player::checkError(int status) const {
