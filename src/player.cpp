@@ -168,8 +168,9 @@ Player::Volume Player::incrVolume(Player::Volume v) {
     _lg(elog::trace) << "incrVolume(" << v << ')';
     Player::Volume vol = volume();
     vol += v;
-    checkError(mpv_set_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
-    checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
+		if(vol < 0)   vol = 0;
+		if(vol > 150) vol = 150;
+    checkError(mpv_set_property_async(_mpv, 0, "volume", MPV_FORMAT_DOUBLE, &vol));
     sendEvent(PlayerEvt::volumeChanged, vol);
     return vol;
 }
