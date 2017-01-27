@@ -57,10 +57,10 @@ bool Player::add(std::string const & id, std::string const & name) {
 
 bool Player::add(const WebMusic &m) {
     _lg(elog::trace) << "add(WebMusic{" << m.id() << ", " << m.title() << "})";
-    if (_playlist.size() > playlistMaxSize) {
-        _lg(elog::warn) << "Playlist is full.";
-        return false;
-    }
+//    if (_playlist.size() > playlistMaxSize) {
+//        _lg(elog::warn) << "Playlist is full.";
+//        return false;
+//    }
     _archive.add(m);
     _mutex.lock();
     _plv.clear();
@@ -73,7 +73,7 @@ bool Player::add(const WebMusic &m) {
 
 util::Optional<WebMusic> Player::addRandom() {
     _lg(elog::trace) << "addRandom()";
-    if (!_archive.empty() && _playlist.size() < playlistMaxSize) {
+    if (!_archive.empty()/* && _playlist.size() < playlistMaxSize*/) {
         util::Optional<WebMusic> wm{_archive.random()};
         _mutex.lock();
         _playlist.push_back(wm);
