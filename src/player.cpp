@@ -15,7 +15,7 @@ Player::Player(Archive & archive)
     if (!_mpv) std::runtime_error("libmpv: create context failed");
 
 	_lg(elog::dbg) << "initializing mpv";
-    checkError(mpv_initialize(_mpv));
+    checkError(&mpv_initialize, _mpv);
 
 	int status;
     int opt = 1;
@@ -31,7 +31,7 @@ Player::Player(Archive & archive)
         _lg(elog::err) << "failed: " << mpv_error_string(status);
 
 	_lg(elog::dbg) << "Request info property";
-    checkError(mpv_request_log_messages(_mpv, "info"));
+    checkError(&mpv_request_log_messages, _mpv, "info");
 
     _lg << "mpv options:";
     _lg << "  - version = " << mpv_get_property_string(_mpv, "mpv-version");
@@ -45,7 +45,7 @@ Player::~Player() {
     if (_started) {
         mpv_terminate_destroy(_mpv);	// kill mpv
         _mpvEventThread.join();			// wait mpv event thread
-        Lock lock{_playMutex};			// wait playNext thread
+//        Lock lock{_playMutex};			// wait playNext thread
     }
     _lg(elog::trace) << "~Player() end";
 }
@@ -61,9 +61,9 @@ bool Player::add(const WebMusic &m) {
         _lg(elog::warn) << "Playlist is full.";
         return false;
     }
+    _archive.add(m);
     _mutex.lock();
     _plv.clear();
-    _archive.add(m);
     _playlist.push_back(m);
     _mutex.unlock();
     sendEvent(PlayerEvt::added, _playlist.back());
@@ -118,15 +118,17 @@ util::Optional<WebMusic> Player::remove(std::string const & id) {
 util::Optional<WebMusic> Player::remove(std::size_t index) {
     _lg(elog::trace) << "remove(" << index << ')';
 
-    if (index < _plv.size()) {
+    _mutex.lock();
+    std::size_t size = _plv.size();
+    _mutex.unlock();
+
+    if (index < size) {
+        _mutex.lock();
         Playlist::const_iterator it = _plv[index];
         auto music = util::makeOptional(std::move(*it));
-
-        {
-            Lock lock{_mutex};
-            _plv.clear();
-            _playlist.erase(it);
-        }
+        _plv.clear();
+        _playlist.erase(it);
+        _mutex.unlock();
         sendEvent(PlayerEvt::removed, music.get());
         return music;
     }
@@ -158,16 +160,16 @@ void Player::stop() {
 void Player::next() {
     _lg(elog::trace) << "next()";
     char const * params[] = {"stop", nullptr};
-    checkError(mpv_command(_mpv, params));
+    checkError(&mpv_command, _mpv, params);
 }
 
 void Player::togglePause() {
     _lg(elog::trace) << "togglePause()";
     int pauseState;
-    checkError(mpv_get_property(_mpv, "pause", MPV_FORMAT_FLAG, &pauseState));
+    checkError(&mpv_get_property, _mpv, "pause", MPV_FORMAT_FLAG, &pauseState);
     _lg(elog::dbg) << "current pause state = " << pauseState;
     pauseState = !pauseState;
-    checkError(mpv_set_property_async(_mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState));
+    checkError(&mpv_set_property_async, _mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState);
     _lg << "pause state = " << pauseState;
     _pause = pauseState;
 		sendEvent(PlayerEvt::paused, _pause);
@@ -179,7 +181,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
     vol += v;
 		if(vol < 0)   vol = 0;
 		if(vol > 150) vol = 150;
-    checkError(mpv_set_property_async(_mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol));
+    checkError(&mpv_set_property_async, _mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol);
 		sendEvent(PlayerEvt::volumeChanged, vol);
     return vol;
 }
@@ -187,7 +189,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
 Player::Volume Player::volume() {
     _lg(elog::trace) << "volume()";
     Player::Volume vol;
-    checkError(mpv_get_property(_mpv, "volume", MPV_FORMAT_DOUBLE, &vol));
+    checkError(&mpv_get_property, _mpv, "volume", MPV_FORMAT_DOUBLE, &vol);
     _lg(elog::dbg) << "current volume = " << vol;
     return vol;
 }
@@ -220,7 +222,7 @@ double Player::duration() {
     _lg(elog::trace) << "duration()";
     if (!_isPlaying) return 0./0.;
     double val;
-    checkError(mpv_get_property(_mpv, "duration", MPV_FORMAT_DOUBLE, &val));
+    checkError(&mpv_get_property, _mpv, "duration", MPV_FORMAT_DOUBLE, &val);
     _lg(elog::dbg) << "duration = " << val << " s";
     return val;
 }
@@ -229,7 +231,7 @@ double Player::timePos() {
     _lg(elog::trace) << "timePos()";
     if (!_isPlaying) return 0./0.;
     double time;
-    checkError(mpv_get_property(_mpv, "time-pos", MPV_FORMAT_DOUBLE, &time));
+    checkError(&mpv_get_property, _mpv, "time-pos", MPV_FORMAT_DOUBLE, &time);
     _lg(elog::dbg) << "time = " << time << " s";
     return time;
 }
@@ -237,8 +239,14 @@ double Player::timePos() {
 WebMusic Player::current() {
     _lg(elog::trace) << "current()";
     std::string id, title;
-    id = mpv_get_property_string(_mpv, "path");
-    title = mpv_get_property_string(_mpv, "media-title");
+    _mpvMutex.lock();
+    char * tmp = mpv_get_property_string(_mpv, "path");
+    if (tmp) id = tmp;
+    mpv_free(tmp);
+    tmp = mpv_get_property_string(_mpv, "media-title");
+    if (tmp) title = tmp;
+    mpv_free(tmp);
+    _mpvMutex.unlock();
     _lg(elog::dbg) << "url = " << id;
     _lg(elog::dbg) << "media-title = " << title;
     return WebMusic{id.substr(id.size() - cfg::ytIdSize), title};
@@ -269,10 +277,6 @@ void Player::run() {
     _lg << "mpv thread finished";
 }
 
-void Player::checkError(int status) const {
-    if (status < 0) throw std::runtime_error(mpv_error_string(status));
-}
-
 void Player::asyncPlayNext() {
     _lg(elog::trace) << "asyncPlayNext()";
     if (!_playMutex.try_lock()) return;
@@ -289,11 +293,10 @@ void Player::asyncPlayNext() {
             currentMusic = _playlist.front();
             _playlist.pop_front();
         }
-        _isPlaying = true;
         sendEvent(PlayerEvt::currentChanged, currentMusic);
         std::string url = currentMusic.url();
         char const * params[] = {"loadfile", url.c_str(), nullptr};
-        checkError(mpv_command(_mpv, params));
+        checkError(&mpv_command, _mpv, params);
     }).detach();
 }
 

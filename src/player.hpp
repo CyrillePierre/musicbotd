@@ -45,6 +45,7 @@ private:
     std::mutex				_playMutex;
     std::thread				_mpvEventThread;
     mutable std::mutex      _mutex;
+    mutable std::mutex      _mpvMutex;
     std::condition_variable _cv;
     mutable PlayListView	_plv;
     mpv_handle *			_mpv;
@@ -82,7 +83,17 @@ public:
 private:
     void run();
     void eventAsync(std::uint64_t userdata, void * data);
-    void checkError(int status) const;
     void asyncPlayNext();
     void sendEvent(PlayerEvt pe, util::Any && any = util::Any{});
+
+    template <class... Args, class... Prms>
+    void checkError(int (*fn)(Args...), Prms &&... args) const;
 };
+
+template <class... Args, class... Prms>
+void Player::checkError(int (*fn)(Args...), Prms &&... args) const {
+    _mpvMutex.lock();
+    int status = fn(std::forward<Prms>(args)...);
+    _mpvMutex.unlock();
+    if (status < 0) throw std::runtime_error(mpv_error_string(status));
+}
