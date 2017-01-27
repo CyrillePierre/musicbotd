@@ -5,13 +5,25 @@
 #include <netdb.h>
 #include <errno.h>
 #include <string.h>
- 
+
+extern "C" {
+#include "signal.h"
+}
+
 #include "server.hpp"
+
+
+static void sigpipe(int) {}
+
 
 /* Cette macro permet à tout ceux qui ont la flemme de réécrire
  * la vérification des fonctions POSIX de n'écrire qu'une seule ligne */
 #define ERROR_IF(FUNCTION) \
     if (FUNCTION) { perror(#FUNCTION); exit(errno); }
+
+net::Server::Server(int port) : _port(port) {
+    signal(SIGPIPE, &sigpipe);
+}
 
 void net::Server::connect()
 {
@@ -38,6 +50,7 @@ void net::Server::connect()
 
 void net::Server::disconnect()
 {
+    std::lock_guard<std::mutex> lock{_clientListMutex};
     for (Client const & c : _clients) c.close();
 	close(_fd);
     _clients.clear();
@@ -55,7 +68,9 @@ net::Client const & net::Server::accept()
  
     ERROR_IF((newfd = ::accept(_fd, &client, &clientlen)) == -1);
 
+    _clientListMutex.lock();
 	auto clientPair = _clients.insert(Client(newfd));
+    _clientListMutex.unlock();
 	
 	if (!clientPair.second)
 		std::cerr << "Erreur d'insertion d'un client." << std::endl;

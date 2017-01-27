@@ -38,7 +38,7 @@ void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const &
 	lg << "disconnected";
 }
 
-int main() {
+int main() try {
 	using namespace std::placeholders;
 
     elog::cfg().logLevel(elog::msg);
@@ -78,12 +78,16 @@ int main() {
 
 	player.start();
 
-//	std::cin.get();
-	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
+    std::cin.get();
+//	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
 
 	l << "disconnecting server";
 	server.disconnect();
 	serverAPI.disconnect();
 
 	return 0;
+}
+catch (std::exception const & e) {
+	elog::Logger l;
+	l(elog::crit) << "Exception: " << e.what();
 }

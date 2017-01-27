@@ -4,6 +4,7 @@
 #include <set>
 #include <thread>
 #include <iostream>
+#include <mutex>
 #include "client.hpp"
 
 namespace net
@@ -23,13 +24,14 @@ struct Server
 	typedef std::set<Client> Clients;
 
 private:
-	int		_port;		// port de connexion
-	int		_fd;		// socket
-	Clients	_clients;	// Ensemble des clients connectés
+    int		   _port;		// port de connexion
+    int		   _fd;		// socket
+    Clients	   _clients;	// Ensemble des clients connectés
+    mutable std::mutex _clientListMutex;
 
 public:
 	/** @brief Constructeur */
-	Server(int port) : _port(port) {}
+    Server(int port);
 
 	/** @brief Démarrage du serveur */
 	void connect();
@@ -85,10 +87,10 @@ void net::Server::asyncAcceptLoop(Callable && fn)
  * @param size : la taille du buffer
  */
 template <typename Buffer>
-inline void net::Server::writeAll(Buffer && buf, std::size_t size) const
-{
-	for (net::Client const & c : _clients)
-		c.write(std::forward<Buffer>(buf), size);
+inline void net::Server::writeAll(Buffer && buf, std::size_t size) const {
+    std::lock_guard<std::mutex> lock{_clientListMutex};
+    for (net::Client const & c : _clients)
+        c.write(std::forward<Buffer>(buf), size);
 }
 
 #endif

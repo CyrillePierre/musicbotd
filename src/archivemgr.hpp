@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <mutex>
 #include "archive.hpp"
 
 class ArchiveMgr {
@@ -12,6 +13,7 @@ public:
 private:
 	std::string const _wd;
 	std::map<std::string, ArchivePtr> _archives;
+    std::mutex _archivesMutex;
 
 public:
 	ArchiveMgr(std::string const & wd = "."): _wd{wd} {}
