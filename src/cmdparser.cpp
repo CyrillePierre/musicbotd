@@ -27,8 +27,9 @@ std::string CmdParser::add(std::istringstream & iss) {
         _lg(elog::dbg) << "video title = \"" << title << '"';
 				WebMusic wm{id, title};
 				if(_archive) _archive->add(wm);
-        _player.add(wm);
-        return "";
+        if (_player.add(wm))
+            return "";
+        return "The playlist is full.\n";
     }
     catch (UnknownVideo const & e) {
         return std::string{e.what()} + "\n";
@@ -125,9 +126,9 @@ std::string CmdParser::state(std::istringstream &) {
 }
 
 std::string CmdParser::random(std::istringstream &) {
-		if(_archive && !_archive->empty()) _player.add(_archive->random());
-    else _player.addRandom();
-    return "";
+    if(_archive && !_archive->empty()) _player.add(_archive->random());
+    else if (_player.addRandom()) return "";
+    return "The playlist is full.\n";
 }
 
 std::string CmdParser::pl(std::istringstream & iss) {

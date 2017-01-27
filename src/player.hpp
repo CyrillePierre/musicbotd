@@ -33,6 +33,9 @@ struct Player {
     using Lock = std::unique_lock<std::mutex>;
     using EventHandler = std::function<void(PlayerEvt, util::Any)>;
 
+public:
+    static constexpr std::size_t playlistMaxSize = 100;
+
 private:
     Playlist                _playlist;
     Archive &               _archive;
@@ -52,8 +55,8 @@ public:
     Player(Archive & archive);
     ~Player();
 
-    void add(std::string const & id, std::string const & name);
-    void add(WebMusic const & m);
+    bool add(std::string const & id, std::string const & name);
+    bool add(WebMusic const & m);
     util::Optional<WebMusic> addRandom();
     void remove(Playlist::const_iterator it);
     util::Optional<WebMusic> remove(std::string const & id);
