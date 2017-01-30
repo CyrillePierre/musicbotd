@@ -27,10 +27,10 @@ std::string CmdParserAPI::add(std::istringstream & iss) {
 			std::string title(_yt.getVideoTitle(cfg::ytUrlPrefix + id));
 			_lg(elog::dbg) << "video title = \"" << title << '"';
 			WebMusic wm{id, title};
-			if(_archive) _archive->add(wm);
-            if (_player.add(wm))
-                return "";
-            json["error"] = "The playlist is full.";
+			if (_archive) _archive->add(wm);
+			if (_player.add(wm))
+				return "";
+			json["error"] = "The playlist is full.";
 		}
 		catch (UnknownVideo const & e) {
 			json["error"] = std::string{e.what()};
@@ -145,11 +145,13 @@ std::string CmdParserAPI::state(std::istringstream &) {
 }
 
 std::string CmdParserAPI::random(std::istringstream &) {
-	if(_archive && !_archive->empty()) _player.add(_archive->random());
-    else if (_player.addRandom()) return "";
-    nlohmann::json json;
-    json["error"] = "The playlist is full.";
-    return json.dump() + "\n";
+	bool ok = false;
+	if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
+	else                               ok = _player.addRandom();
+	if(ok) return "";
+	nlohmann::json json;
+	json["error"] = "The playlist is full.";
+	return json.dump() + "\n";
 }
 
 std::string CmdParserAPI::pl(std::istringstream & iss) {

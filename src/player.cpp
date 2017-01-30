@@ -27,8 +27,8 @@ Player::Player(Archive & archive)
     opt = 0;
 
 	_lg(elog::dbg) << "Set video property";
-    if ((status = mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt)) < 0)
-        _lg(elog::err) << "failed: " << mpv_error_string(status);
+	if ((status = mpv_set_property(_mpv, "video", MPV_FORMAT_FLAG, &opt)) < 0)
+		_lg(elog::err) << "failed: " << mpv_error_string(status);
 
 	_lg(elog::dbg) << "Request info property";
     checkError(&mpv_request_log_messages, _mpv, "info");

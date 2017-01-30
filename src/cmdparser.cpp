@@ -126,8 +126,10 @@ std::string CmdParser::state(std::istringstream &) {
 }
 
 std::string CmdParser::random(std::istringstream &) {
-    if(_archive && !_archive->empty()) _player.add(_archive->random());
-    else if (_player.addRandom()) return "";
+		bool ok = false;
+    if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
+    else                               ok = _player.addRandom();
+		if(ok)	return "";
     return "The playlist is full.\n";
 }
 
