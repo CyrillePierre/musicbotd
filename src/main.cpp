@@ -41,16 +41,15 @@ void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const &
 int main() try {
 	using namespace std::placeholders;
 
-	elog::cfg().logLevel(elog::trace);
-//    elog::cfg().logLevel(elog::msg);
-//    elog::cfg().timeEnabled(true);
-//    elog::cfg().stream("/var/log/musicbotd.log");
-	elog::Logger l;
+    elog::cfg().logLevel(elog::msg);
+    elog::cfg().timeEnabled(true);
+    elog::cfg().stream("/var/log/musicbotd.log");
+    elog::Logger l;
 
     int port = 1937, portAPI = 1938;
 
-	ArchiveMgr archivemgr;
-	Archive archive{"archive"};
+	ArchiveMgr archivemgr{"/var/lib/musicbotd/pl"};
+	Archive archive{"/var/lib/musicbotd/archive"};
 
 	Player player{archive};
 	net::Server server{port}, serverAPI{portAPI};
@@ -79,8 +78,8 @@ int main() try {
 
 	player.start();
 
-    std::cin.get();
-//	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
+//    std::cin.get();
+	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
 
 	l << "disconnecting server";
 	server.disconnect();
