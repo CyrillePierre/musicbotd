@@ -22,8 +22,8 @@ ArchiveMgr::Playlists ArchiveMgr::list() {
     using namespace boost::filesystem;
     path workdir{_wd};
     Playlists pls;
-    for (directory_entry & entry : directory_iterator{workdir}) {
-        path const & p = entry.path();
+    for (directory_iterator it{workdir}; it != directory_iterator{}; ++it) {
+        path const & p = it->path();
         if (is_regular_file(p)) {
             std::string filename = p.filename().generic_string();
             if (filename[0] != '.') pls.push_back(filename);
