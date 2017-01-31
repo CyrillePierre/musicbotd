@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iosfwd>
 #include <list>
 #include <vector>
 #include <string>
@@ -70,7 +71,7 @@ public:
     bool isPaused() const { return _pause; }
     bool isStarted() const { return _started; }
     Volume incrVolume(Volume v);
-    Volume volume();
+    Volume volume() const;
     PlayListView const & list() const;
     PlayListView const & list(std::size_t nbLines) const;
     std::size_t playlistSize() const;
@@ -80,6 +81,9 @@ public:
     double timePos();
     WebMusic current();
 
+	friend std::ostream &operator<<(std::ostream &os, Player const&player);
+	friend std::istream &operator>>(std::istream &is, Player &player);
+	
 private:
     void run();
     void eventAsync(std::uint64_t userdata, void * data);

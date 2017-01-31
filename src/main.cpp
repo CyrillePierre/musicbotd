@@ -2,11 +2,15 @@
 #include <net/server.hpp>
 #include <log/log.hpp>
 #include <functional>
+#include <csignal>
+
 #include "player.hpp"
 #include "cmdparser.hpp"
 #include "cmdparserapi.hpp"
 #include "eventviewer.hpp"
 #include "archivemgr.hpp"
+
+#define MB_BASE_PATH	"/var/lib/musicbotd/"
 
 namespace elog = ese::log;
 
@@ -41,17 +45,32 @@ void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const &
 int main() try {
 	using namespace std::placeholders;
 
-    elog::cfg().logLevel(elog::msg);
-    elog::cfg().timeEnabled(true);
-    elog::cfg().stream("/var/log/musicbotd.log");
-    elog::Logger l;
+	static volatile bool signalReceived = false;
+	static std::condition_variable cv;
 
-    int port = 1937, portAPI = 1938;
+	struct sigaction action;
+	action.sa_handler = [](int) { signalReceived = true; cv.notify_one(); };
+	action.sa_flags = 0;
+	sigemptyset(&action.sa_mask);
+	sigaction(SIGINT, &action, NULL);
+	sigaction(SIGTERM, &action, NULL);
 
-	ArchiveMgr archivemgr{"/var/lib/musicbotd/pl"};
-	Archive archive{"/var/lib/musicbotd/archive"};
+	elog::cfg().logLevel(elog::msg);
+	elog::cfg().timeEnabled(true);
+	elog::cfg().stream("/var/log/musicbotd.log");
+	elog::Logger l;
+
+	int port = 1937, portAPI = 1938;
+
+	ArchiveMgr archivemgr{MB_BASE_PATH "pl"};
+	Archive archive{MB_BASE_PATH "archive"};
 
 	Player player{archive};
+	{
+		std::ifstream in{MB_BASE_PATH "musicbotd.save"};
+		if(in) in >> player;
+	}
+
 	net::Server server{port}, serverAPI{portAPI};
 
 	l << "server port (TCP): " << port;
@@ -78,8 +97,14 @@ int main() try {
 
 	player.start();
 
-//    std::cin.get();
-	for (;;) std::this_thread::sleep_for(std::chrono::seconds{100});
+	{
+		std::mutex mutex;
+		std::unique_lock<std::mutex> lock(mutex);
+		cv.wait(lock, []{ return signalReceived; });
+
+		std::ofstream of{MB_BASE_PATH "musicbotd.save"};
+		of << player;
+	}
 
 	l << "disconnecting server";
 	server.disconnect();

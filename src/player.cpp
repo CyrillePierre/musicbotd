@@ -2,6 +2,7 @@
 #include <iostream>
 #include <mpv/client.h>
 #include <stdexcept>
+#include <nlohmann/json.hpp>
 #include "player.hpp"
 
 namespace elog = ese::log;
@@ -186,7 +187,7 @@ Player::Volume Player::incrVolume(Player::Volume v) {
     return vol;
 }
 
-Player::Volume Player::volume() {
+Player::Volume Player::volume() const {
     _lg(elog::trace) << "volume()";
     Player::Volume vol;
     checkError(&mpv_get_property, _mpv, "volume", MPV_FORMAT_DOUBLE, &vol);
@@ -250,6 +251,40 @@ WebMusic Player::current() {
     _lg(elog::dbg) << "url = " << id;
     _lg(elog::dbg) << "media-title = " << title;
     return WebMusic{id.substr(id.size() - cfg::ytIdSize), title};
+}
+
+std::ostream &operator<<(std::ostream &os, Player const&player) {
+	nlohmann::json json;
+	json["volume"] = player.volume();
+	json["paused"] = player.isPaused();
+	json["list"] = nlohmann::json::array();
+	for(WebMusic const&wm: player._playlist) {
+		nlohmann::json item;
+		item["id"] = wm.id();
+		item["title"] = wm.title();
+		json["list"] += item;
+	}
+
+	return os << json.dump(2);
+}
+
+std::istream &operator>>(std::istream &is, Player &player) {
+	std::string content;
+	for(std::string line; std::getline(is, line); content += line);
+	
+	try {
+		nlohmann::json json = nlohmann::json::parse(content);
+		if(json.count("volume"))	player.incrVolume(json["volume"].get<Player::Volume>()-player.volume());
+		if(json.count("paused")) {
+			bool p = json["paused"].get<bool>();
+			if((p && !player.isPaused()) || (!p && player.isPaused())) player.togglePause();
+		}
+		if(json.count("list"))
+			for(nlohmann::json const&item: json["list"])
+				player.add(item["id"].get<std::string>(), item["title"].get<std::string>());
+	} catch(std::exception &e) {
+		player._lg(elog::err) << "cannot load state: " << e.what();
+	}
 }
 
 void Player::run() {
