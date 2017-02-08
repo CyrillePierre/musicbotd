@@ -11,6 +11,10 @@ CmdParser::CmdParser(Player & player, ArchiveMgr & archivemgr) : CmdParserBase{p
     _lg.prefix("cmdParser: ");
 }
 
+std::string CmdParser::error(std::string const & msg) const {
+	return msg;
+}
+
 std::string CmdParser::add(std::istringstream & iss) {
     std::string id;
     iss >> id;
@@ -167,4 +171,10 @@ std::string CmdParser::auth(std::istringstream & iss) {
 	iss >> token;
 	_auth = TokenMgr::instance().isValid(token);
 	return _auth? "Authentication success\n":"Authentication failed\n";
+}
+
+std::string CmdParser::tts(std::istringstream & iss) {
+	std::string text;
+	std::getline(iss, text);
+	return "";
 }

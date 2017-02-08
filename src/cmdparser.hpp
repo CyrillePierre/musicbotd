@@ -7,6 +7,8 @@ public:
     CmdParser(Player & player, ArchiveMgr & archivemgr);
 
 private:
+		std::string error(std::string const & msg) const;
+
     std::string add(std::istringstream & iss);
     std::string list(std::istringstream & iss);
     std::string rm(std::istringstream & iss);
@@ -23,6 +25,7 @@ private:
     std::string plquit(std::istringstream & iss);
     std::string pllist(std::istringstream & iss);
 		std::string auth(std::istringstream & iss);
+		std::string tts(std::istringstream & iss);
 
     friend CmdParserBase<CmdParser>;
 };

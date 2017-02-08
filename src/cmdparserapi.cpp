@@ -12,15 +12,20 @@ CmdParserAPI::CmdParserAPI(Player & player, ArchiveMgr & archivemgr) : CmdParser
 	_lg.prefix("cmdParserAPI: ");
 }
 
-std::string CmdParserAPI::add(std::istringstream & iss) {
-	std::string id;
-	iss >> id;
+std::string CmdParserAPI::error(std::string const & msg) const {
 	nlohmann::json json;
+	json["error"] = msg;
+	return json.dump();
+}
+
+std::string CmdParserAPI::add(std::istringstream & iss) {
+	std::string id, errmsg;
+	iss >> id;
 
 	if (id.size() < cfg::ytIdSize) {
 		std::string err{"Invalid video ID : '" + id + "'"};
 		_lg(elog::warn) << err;
-		json["error"] = err;
+		errmsg = err;
 	} else {
 		try {
 			id = id.substr(id.size() - cfg::ytIdSize);
@@ -30,14 +35,14 @@ std::string CmdParserAPI::add(std::istringstream & iss) {
 			if (_archive) _archive->add(wm);
 			if (_player.add(wm))
 				return "";
-			json["error"] = "The playlist is full.";
+			errmsg = "The playlist is full.";
 		}
 		catch (UnknownVideo const & e) {
-			json["error"] = std::string{e.what()};
+			errmsg = std::string{e.what()};
 		}
 	}
 
-	return json.dump() + "\n";
+	return error(errmsg) + "\n";
 }
 
 std::string CmdParserAPI::list(std::istringstream & iss) {
@@ -74,8 +79,7 @@ std::string CmdParserAPI::list(std::istringstream & iss) {
 }
 
 std::string CmdParserAPI::rm(std::istringstream & iss) {
-	nlohmann::json json;
-	std::string id;
+	std::string id, errmsg;
 	if (iss >> id) {
 		char * end;
 		std::size_t index = std::strtoul(id.c_str(), &end, 10);
@@ -86,15 +90,15 @@ std::string CmdParserAPI::rm(std::istringstream & iss) {
 			_player.remove(id);
 			return "";
 		} else {
-			json["error"] = "remove failed";
+			errmsg = "remove failed";
 			_lg(elog::warn) << "remove failed (id = " << id << ')';
 		}
 	}
 	else {
-		json["error"] = "remove failed";
+		errmsg = "remove failed";
 		_lg(elog::warn) << "Remove failed: parsing error";
 	}
-	return json.dump() + "\n";
+	return error(errmsg) + "\n";
 }
 
 std::string CmdParserAPI::clear(std::istringstream &) {
@@ -149,24 +153,21 @@ std::string CmdParserAPI::random(std::istringstream &) {
 	if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
 	else                               ok = _player.addRandom();
 	if(ok) return "";
-	nlohmann::json json;
-	json["error"] = "The playlist is full.";
-	return json.dump() + "\n";
+	return error("The playlist is full.") + "\n";
 }
 
 std::string CmdParserAPI::pl(std::istringstream & iss) {
-	nlohmann::json json;
 	std::string fn;
 	iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive = _archivemgr.load(fn);
-    if (_archive) {
-        json["event"] = 10;
-        json["value"] = fn;
-        return json.dump() + "\n";
-    }
-    json["error"] = "Invalid playlist name";
-    return json.dump() + "\n";
+	if (_archive) {
+		nlohmann::json json;
+		json["event"] = 10;
+		json["value"] = fn;
+		return json.dump() + "\n";
+	}
+	return error("Invalid playlist name") + "\n";
 }
 
 std::string CmdParserAPI::plcur(std::istringstream &) {
@@ -186,20 +187,25 @@ std::string CmdParserAPI::plquit(std::istringstream &) {
 }
 
 std::string CmdParserAPI::pllist(std::istringstream & iss) {
-    auto playlists = _archivemgr.list();
-    nlohmann::json json;
-		json["event"] = 12;
-    json["value"] = nlohmann::json::array();
-    for (auto const & elem : playlists)
-        json["value"] += elem;
-    return json.dump() + "\n";
+	auto playlists = _archivemgr.list();
+	nlohmann::json json;
+	json["event"] = 12;
+	json["value"] = nlohmann::json::array();
+	for (auto const & elem : playlists)
+		json["value"] += elem;
+	return json.dump() + "\n";
 }
 
 std::string CmdParserAPI::auth(std::istringstream & iss) {
 	std::string token;
-	nlohmann::json json;
 	iss >> token;
 	if(!(_auth = TokenMgr::instance().isValid(token)))
-		json["error"] = "Authentication failed";
-	return json.dump() + "\n";
+		return error("Authentication failed") + "\n";
+	return "";
+}
+
+std::string CmdParserAPI::tts(std::istringstream & iss) {
+	std::string text;
+	std::getline(iss, text);
+	return "";
 }

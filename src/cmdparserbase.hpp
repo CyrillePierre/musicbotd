@@ -47,15 +47,18 @@ public:
     if (cmd == "current")   return _this->current(iss);
     if (cmd == "state")     return _this->state(iss);
     if (cmd == "random")    return _this->random(iss);
-	if (cmd == "pl")        return _this->pl(iss);
-	if (cmd == "plcur")     return _this->plcur(iss);
-	if (cmd == "plquit")    return _this->plquit(iss);
-	if (cmd == "help")      return help(iss);
+		if (cmd == "pl")        return _this->pl(iss);
+		if (cmd == "plcur")     return _this->plcur(iss);
+		if (cmd == "plquit")    return _this->plquit(iss);
+		if (cmd == "help")      return help(iss);
     if (cmd == "pllist")    return _this->pllist(iss);
 		if (cmd == "auth")      return _this->auth(iss);
+		if (_auth) {
+			if (cmd == "tts")       return _this->tts(iss);
+		}
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
-		return "unknown command '" + cmd + "'\n";
+		return _this->error("unknown command '" + cmd + "'") + "\n";
 	}
 
 private:
@@ -77,6 +80,7 @@ private:
  progress          Show the current position in the current music.
  current           Show the current video name.
  auth token        Authenticate with a specified token
+ tts text          [auth] Text-to-Speech
 )#";
     }
 };
