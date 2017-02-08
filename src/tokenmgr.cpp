@@ -1,12 +1,12 @@
 #include "tokenmgr.hpp"
 #include <fstream>
 #include <algorithm>
-
-TokenMgr::TokenMgr() {
-	std::ifstream f{"/etc/musicbotd/tokens"};
-	if(f) for(std::string line; std::getline(f, line); _tokens.push_back(line));
-}
+#include <vector>
+#include <string>
 
 bool TokenMgr::isValid(std::string const&token) const {
-	return std::find(_tokens.begin(), _tokens.end(), token) != _tokens.end();
+	std::ifstream f{"/etc/musicbotd/tokens"};
+	std::vector<std::string> tokens;
+	if(f) for(std::string line; std::getline(f, line); tokens.push_back(line));
+	return std::find(tokens.begin(), tokens.end(), token) != tokens.end();
 }
