@@ -25,7 +25,6 @@ private:
     std::string plquit(std::istringstream & iss);
     std::string pllist(std::istringstream & iss);
 		std::string auth(std::istringstream & iss);
-		std::string tts(std::istringstream & iss);
 
     friend CmdParserBase<CmdParser>;
 };

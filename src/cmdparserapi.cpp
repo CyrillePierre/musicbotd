@@ -203,9 +203,3 @@ std::string CmdParserAPI::auth(std::istringstream & iss) {
 		return error("Authentication failed") + "\n";
 	return "";
 }
-
-std::string CmdParserAPI::tts(std::istringstream & iss) {
-	std::string text;
-	std::getline(iss, text);
-	return "";
-}

@@ -172,9 +172,3 @@ std::string CmdParser::auth(std::istringstream & iss) {
 	_auth = TokenMgr::instance().isValid(token);
 	return _auth? "Authentication success\n":"Authentication failed\n";
 }
-
-std::string CmdParser::tts(std::istringstream & iss) {
-	std::string text;
-	std::getline(iss, text);
-	return "";
-}
