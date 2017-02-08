@@ -161,3 +161,10 @@ std::string CmdParser::pllist(std::istringstream &) {
         oss << "  - " << elem << std::endl;
     return oss.str();
 }
+
+std::string CmdParser::auth(std::istringstream & iss) {
+	std::string token;
+	iss >> token;
+	_auth = TokenMgr::instance().isValid(token);
+	return _auth? "Authentication success\n":"Authentication failed\n";
+}

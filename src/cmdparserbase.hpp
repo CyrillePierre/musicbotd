@@ -6,6 +6,7 @@
 #include "player.hpp"
 #include "archivemgr.hpp"
 #include "archive.hpp"
+#include "tokenmgr.hpp"
 
 template<typename Impl>
 class CmdParserBase {
@@ -17,9 +18,11 @@ protected:
 	ese::log::Logger _lg;
 	std::shared_ptr<Archive> _archive;
 
+	bool _auth;
+
 public:
 	CmdParserBase(Player & player, ArchiveMgr & archivemgr):
-		_this{static_cast<Impl*>(this)}, _player{player}, _archivemgr{archivemgr} {}
+		_this{static_cast<Impl*>(this)}, _player{player}, _archivemgr{archivemgr}, _auth{false} {}
 
 	~CmdParserBase() {
 		if(_archive) _archivemgr.unload(std::move(_archive));
@@ -49,6 +52,7 @@ public:
 	if (cmd == "plquit")    return _this->plquit(iss);
 	if (cmd == "help")      return help(iss);
     if (cmd == "pllist")    return _this->pllist(iss);
+		if (cmd == "auth")      return _this->auth(iss);
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
 		return "unknown command '" + cmd + "'\n";
@@ -72,6 +76,7 @@ private:
  state             Show the current states of the player.
  progress          Show the current position in the current music.
  current           Show the current video name.
+ auth token        Authenticate with a specified token
 )#";
     }
 };

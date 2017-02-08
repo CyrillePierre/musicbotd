@@ -194,3 +194,12 @@ std::string CmdParserAPI::pllist(std::istringstream & iss) {
         json["value"] += elem;
     return json.dump() + "\n";
 }
+
+std::string CmdParserAPI::auth(std::istringstream & iss) {
+	std::string token;
+	nlohmann::json json;
+	iss >> token;
+	if(!(_auth = TokenMgr::instance().isValid(token)))
+		json["error"] = "Authentication failed";
+	return json.dump() + "\n";
+}
