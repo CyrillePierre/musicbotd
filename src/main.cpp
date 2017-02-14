@@ -23,9 +23,9 @@ void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const &
 	char buf[128];
 	Parser parser{player, archivemgr};
 
-	while (std::size_t nbRead = client.read(buf, 128)) {
+	while (std::size_t nbRead = client.readUntil(buf, 128, '\n')) {
 		try {
-			buf[--nbRead] = 0;
+			buf[nbRead] = 0;
 			std::string line(buf);
             lg(lglvl) << "cmd '" << line << "'";
 			std::string res{parser.apply(line)};
