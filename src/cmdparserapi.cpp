@@ -55,18 +55,7 @@ std::string CmdParserAPI::list(std::istringstream & iss) {
 	json["event"] = -1;
 	json["value"] = nlohmann::json::array();
 
-	int i = _player.hasCurrent();
-	if(i) {
-		auto const current = _player.current();
-		auto const it = &current;
-		nlohmann::json item = nlohmann::json::object();
-		item["index"] = i++;
-		item["id"] = it->id();
-		item["title"] = it->title();
-		_lg(elog::trace) << "list += [" << it->id() << "] " << it->title();
-		json["value"] += item;
-	}
-
+	int i{};
 	for (auto const & it : *plv) {
 		nlohmann::json item = nlohmann::json::object();
 		item["index"] = i++;
@@ -125,7 +114,7 @@ std::string CmdParserAPI::volume(std::istringstream & iss) {
 		_player.incrVolume(value);
 		return "";
 	} else
-		json["value"] = std::to_string(_player.volume());
+		json["value"] = _player.volume();
 	return json.dump() + "\n";
 }
 
@@ -138,13 +127,21 @@ std::string CmdParserAPI::progress(std::istringstream & iss) {
 }
 
 std::string CmdParserAPI::current(std::istringstream &) {
-	return "";
+	nlohmann::json json = nlohmann::json::object();
+	json["event"] = -3;
+	if(_player.hasCurrent()) {
+		auto const current = _player.current();
+		json["value"]["id"] = current.id();
+		json["value"]["title"] = current.title();
+	} else
+		json["no_current"] = "";
+	return json.dump() + "\n";
 }
 
 std::string CmdParserAPI::state(std::istringstream &) {
 	nlohmann::json json;
 	json["event"] = 4;
-	json["value"] = std::to_string(_player.isPaused());
+	json["value"] = _player.isPaused();
 	return json.dump() + "\n";
 }
 
