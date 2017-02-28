@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include <log/log.hpp>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "ytnamesolver.hpp"
 #include "player.hpp"
 #include "archivemgr.hpp"
@@ -54,8 +56,7 @@ public:
     if (cmd == "pllist")    return _this->pllist(iss);
 		if (cmd == "auth")      return _this->auth(iss);
 		if (_auth) {
-			if (cmd == "tts")       return [&]{ tts("fr-FR", iss); return ""; }();
-			if (cmd == "ttsen")     return [&]{ tts("en-GB", iss); return ""; }();
+			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
 		}
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
@@ -81,16 +82,26 @@ private:
  progress          Show the current position in the current music.
  current           Show the current video name.
  auth token        Authenticate with a specified token
- tts text          [auth] Text-to-Speech
- ttsen text        [auth] English Text-to-Speech
+ tts lang text     [auth] Text-to-Speech
 )#";
     }
 
-		void tts(std::string const & lang, std::istringstream & iss) {
-			std::string text, cmd;
+		void tts(std::istringstream & iss) {
+			std::string lang, text;
+			iss >> lang;
 			std::getline(iss, text);
 			std::replace(text.begin(), text.end(), '"', '\'');
-			cmd = "pico2wave -l"+lang+" -w/var/lib/musicbotd/tts.wav \""+text.substr(0, 256)+"\"";
-			system(cmd.c_str());
+			text = "\""+text.substr(0, 256)+"\"";
+	
+			bool mustPause = !_player.isPaused();
+			if(mustPause) _player.togglePause();
+
+			int pid;
+			if((pid = fork()) == 0) {
+				execlp("simple_google_tts", "simple_google_tts", lang.c_str(), text.c_str(), NULL);
+				exit(0);
+			}
+			waitpid(pid, NULL, 0);
+			if(mustPause) _player.togglePause();
 		}
 };
