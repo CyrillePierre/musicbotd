@@ -90,8 +90,7 @@ private:
 			std::string lang, text;
 			iss >> lang;
 			std::getline(iss, text);
-			std::replace(text.begin(), text.end(), '"', '\'');
-			text = "\""+text.substr(0, 256)+"\"";
+			text = text.substr(0, 256);
 	
 			bool mustPause = !_player.isPaused();
 			if(mustPause) _player.togglePause();
