@@ -4,6 +4,8 @@
 #include <log/log.hpp>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <iomanip>
+
 #include "ytnamesolver.hpp"
 #include "player.hpp"
 #include "archivemgr.hpp"
@@ -57,6 +59,15 @@ public:
 		if (cmd == "auth")      return _this->auth(iss);
 		if (_auth) {
 			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
+			if (cmd == "time")			return [&]{
+				std::time_t t = std::time(nullptr);
+				std::tm tm = *std::localtime(&t);
+				std::ostringstream oss;
+				oss.imbue(std::locale("fr_FR.utf8"));
+				oss << std::put_time(&tm, "%H heure %M");
+				speak("fr", oss.str());
+				return "";
+			}();
 		}
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
@@ -83,16 +94,11 @@ private:
  current           Show the current video name.
  auth token        Authenticate with a specified token
  tts lang text     [auth] Text-to-Speech
+ time							 [auth] Announce time (fr)
 )#";
     }
 
-		void tts(std::istringstream & iss) {
-			std::string lang, text;
-			iss >> lang;
-			std::getline(iss, text);
-			std::replace(text.begin(), text.end(), '"', '\'');
-			text = "\""+text.substr(0, 256)+"\"";
-	
+		void speak(std::string lang, std::string text) {
 			bool mustPause = !_player.isPaused();
 			if(mustPause) _player.togglePause();
 
@@ -103,5 +109,14 @@ private:
 			}
 			waitpid(pid, NULL, 0);
 			if(mustPause) _player.togglePause();
+		}
+
+		void tts(std::istringstream & iss) {
+			std::string lang, text;
+			iss >> lang;
+			std::getline(iss, text);
+			std::replace(text.begin(), text.end(), '"', '\'');
+			text = "\""+text.substr(0, 256)+"\"";
+			speak(lang, text);
 		}
 };
