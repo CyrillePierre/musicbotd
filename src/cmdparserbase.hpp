@@ -64,7 +64,7 @@ public:
 				std::tm tm = *std::localtime(&t);
 				std::ostringstream oss;
 				oss.imbue(std::locale("fr_FR.utf8"));
-				oss << std::put_time(&tm, "%H heure %M");
+				oss << std::put_time(&tm, "Il est %R");
 				speak("fr", oss.str());
 				return "";
 			}();
