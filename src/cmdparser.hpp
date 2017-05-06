@@ -9,24 +9,24 @@ public:
 private:
 		std::string error(std::string const & msg) const;
 
-    std::string add(std::istringstream & iss);
-    std::string list(std::istringstream & iss);
-    std::string rm(std::istringstream & iss);
-    std::string clear(std::istringstream & iss);
-    std::string next(std::istringstream & iss);
-    std::string pause(std::istringstream & iss);
-    std::string volume(std::istringstream & iss);
-    std::string progress(std::istringstream & iss);
-    std::string current(std::istringstream & iss);
-    std::string state(std::istringstream & iss);
-    std::string random(std::istringstream & iss);
-    std::string pl(std::istringstream & iss);
-    std::string plcur(std::istringstream & iss);
-    std::string plquit(std::istringstream & iss);
-    std::string pllist(std::istringstream & iss);
-		std::string subscribe(std::istringstream & iss);
-		std::string unsubscribe(std::istringstream & iss);
-		std::string auth(std::istringstream & iss);
+    std::string add(std::istream & iss);
+    std::string list(std::istream & iss);
+    std::string rm(std::istream & iss);
+    std::string clear(std::istream & iss);
+    std::string next(std::istream & iss);
+    std::string pause(std::istream & iss);
+    std::string volume(std::istream & iss);
+    std::string progress(std::istream & iss);
+    std::string current(std::istream & iss);
+    std::string state(std::istream & iss);
+    std::string random(std::istream & iss);
+    std::string pl(std::istream & iss);
+    std::string plcur(std::istream & iss);
+    std::string plquit(std::istream & iss);
+    std::string pllist(std::istream & iss);
+		std::string subscribe(std::istream & iss);
+		std::string unsubscribe(std::istream & iss);
+		std::string auth(std::istream & iss);
 
     friend CmdParserBase<CmdParser>;
 };

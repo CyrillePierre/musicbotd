@@ -18,7 +18,7 @@ std::string CmdParserAPI::error(std::string const & msg) const {
 	return json.dump();
 }
 
-std::string CmdParserAPI::add(std::istringstream & iss) {
+std::string CmdParserAPI::add(std::istream & iss) {
 	std::string id, errmsg;
 	iss >> id;
 
@@ -45,7 +45,7 @@ std::string CmdParserAPI::add(std::istringstream & iss) {
 	return error(errmsg) + "\n";
 }
 
-std::string CmdParserAPI::list(std::istringstream & iss) {
+std::string CmdParserAPI::list(std::istream & iss) {
 	std::size_t nbLines;
 	Player::PlayListView const * plv;
 	if (iss >> nbLines) plv = &_player.list(nbLines);
@@ -67,7 +67,7 @@ std::string CmdParserAPI::list(std::istringstream & iss) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::rm(std::istringstream & iss) {
+std::string CmdParserAPI::rm(std::istream & iss) {
 	std::string id, errmsg;
 	if (iss >> id) {
 		char * end;
@@ -90,22 +90,22 @@ std::string CmdParserAPI::rm(std::istringstream & iss) {
 	return error(errmsg) + "\n";
 }
 
-std::string CmdParserAPI::clear(std::istringstream &) {
+std::string CmdParserAPI::clear(std::istream &) {
 	_player.clear();
 	return "";
 }
 
-std::string CmdParserAPI::next(std::istringstream &) {
+std::string CmdParserAPI::next(std::istream &) {
 	_player.next();
 	return "";
 }
 
-std::string CmdParserAPI::pause(std::istringstream &) {
+std::string CmdParserAPI::pause(std::istream &) {
 	_player.togglePause();
 	return "";
 }
 
-std::string CmdParserAPI::volume(std::istringstream & iss) {
+std::string CmdParserAPI::volume(std::istream & iss) {
 	nlohmann::json json;
 	Player::Volume value;
 
@@ -118,7 +118,7 @@ std::string CmdParserAPI::volume(std::istringstream & iss) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::progress(std::istringstream & iss) {
+std::string CmdParserAPI::progress(std::istream & iss) {
 	nlohmann::json json;
 	json["event"] = -2;
 	json["value"]["current"] = _player.timePos();
@@ -126,7 +126,7 @@ std::string CmdParserAPI::progress(std::istringstream & iss) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::current(std::istringstream &) {
+std::string CmdParserAPI::current(std::istream &) {
 	nlohmann::json json = nlohmann::json::object();
 	json["event"] = -3;
 	if(_player.hasCurrent()) {
@@ -138,14 +138,14 @@ std::string CmdParserAPI::current(std::istringstream &) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::state(std::istringstream &) {
+std::string CmdParserAPI::state(std::istream &) {
 	nlohmann::json json;
 	json["event"] = 4;
 	json["value"] = _player.isPaused();
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::random(std::istringstream &) {
+std::string CmdParserAPI::random(std::istream &) {
 	bool ok = false;
 	if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
 	else                               ok = _player.addRandom();
@@ -153,7 +153,7 @@ std::string CmdParserAPI::random(std::istringstream &) {
 	return error("The playlist is full.") + "\n";
 }
 
-std::string CmdParserAPI::pl(std::istringstream & iss) {
+std::string CmdParserAPI::pl(std::istream & iss) {
 	std::string fn;
 	iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
@@ -167,7 +167,7 @@ std::string CmdParserAPI::pl(std::istringstream & iss) {
 	return error("Invalid playlist name") + "\n";
 }
 
-std::string CmdParserAPI::plcur(std::istringstream &) {
+std::string CmdParserAPI::plcur(std::istream &) {
 	nlohmann::json json;
 	json["event"] = 11;
 	if(_archive) json["value"] = _archive->name();
@@ -175,7 +175,7 @@ std::string CmdParserAPI::plcur(std::istringstream &) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::plquit(std::istringstream &) {
+std::string CmdParserAPI::plquit(std::istream &) {
 	nlohmann::json json;
 	json["event"] = 19;
 	if(_archive) _archivemgr.unload(std::move(_archive));
@@ -183,7 +183,7 @@ std::string CmdParserAPI::plquit(std::istringstream &) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::pllist(std::istringstream & iss) {
+std::string CmdParserAPI::pllist(std::istream & iss) {
 	auto playlists = _archivemgr.list();
 	nlohmann::json json;
 	json["event"] = 12;
@@ -193,7 +193,7 @@ std::string CmdParserAPI::pllist(std::istringstream & iss) {
 	return json.dump() + "\n";
 }
 
-std::string CmdParserAPI::subscribe(std::istringstream &) {
+std::string CmdParserAPI::subscribe(std::istream &) {
 	_player.subscribe({reinterpret_cast<std::size_t>(this),
 		[&]{
 			std::istringstream dummy;
@@ -203,12 +203,12 @@ std::string CmdParserAPI::subscribe(std::istringstream &) {
 	return "\n";
 }
 
-std::string CmdParserAPI::unsubscribe(std::istringstream &) {
+std::string CmdParserAPI::unsubscribe(std::istream &) {
 	_player.unsubscribe({reinterpret_cast<std::size_t>(this), []{}});
 	return "\n";
 }
 
-std::string CmdParserAPI::auth(std::istringstream & iss) {
+std::string CmdParserAPI::auth(std::istream & iss) {
 	std::string token;
 	iss >> token;
 	if(!(_auth = TokenMgr::instance().isValid(token)))
