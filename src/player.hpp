@@ -33,6 +33,8 @@ struct Player {
     using PlayListView = std::vector<Playlist::const_iterator>;
     using Lock = std::unique_lock<std::mutex>;
     using EventHandler = std::function<void(PlayerEvt, util::Any)>;
+	using Subscriber = std::pair<std::size_t, std::function<void()>>;
+	using Subscribers = std::deque<Subscriber>;
 
 public:
     static constexpr std::size_t playlistMaxSize = 100;
@@ -47,11 +49,13 @@ private:
     std::thread				_mpvEventThread;
     mutable std::mutex      _mutex;
     mutable std::mutex      _mpvMutex;
+    mutable std::mutex      _subscribersMutex;
     std::condition_variable _cv;
     mutable PlayListView	_plv;
     mpv_handle *			_mpv;
     ese::log::Logger		_lg;
     EventHandler			_evtFn;
+	Subscribers _subscribers;
 
 public:
     Player(Archive & archive);
@@ -81,6 +85,9 @@ public:
     double timePos();
     WebMusic current();
 
+	bool subscribe(Subscriber const&subscriber);
+	bool unsubscribe(Subscriber const&subscriber);
+
 	friend std::ostream &operator<<(std::ostream &os, Player const&player);
 	friend std::istream &operator>>(std::istream &is, Player &player);
 	
@@ -89,6 +96,8 @@ private:
     void eventAsync(std::uint64_t userdata, void * data);
     void asyncPlayNext();
     void sendEvent(PlayerEvt pe, util::Any && any = util::Any{});
+
+		void processSubscriptions(std::size_t n);
 
     template <class... Args, class... Prms>
     void checkError(int (*fn)(Args...), Prms &&... args) const;

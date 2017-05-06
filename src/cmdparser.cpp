@@ -15,7 +15,7 @@ std::string CmdParser::error(std::string const & msg) const {
 	return msg;
 }
 
-std::string CmdParser::add(std::istringstream & iss) {
+std::string CmdParser::add(std::istream & iss) {
     std::string id;
     iss >> id;
 
@@ -40,7 +40,7 @@ std::string CmdParser::add(std::istringstream & iss) {
     }
 }
 
-std::string CmdParser::list(std::istringstream & iss) {
+std::string CmdParser::list(std::istream & iss) {
     std::size_t nbLines;
     Player::PlayListView const * plv;
     if (iss >> nbLines) plv = &_player.list(nbLines);
@@ -58,7 +58,7 @@ std::string CmdParser::list(std::istringstream & iss) {
     return oss.str();
 }
 
-std::string CmdParser::rm(std::istringstream & iss) {
+std::string CmdParser::rm(std::istream & iss) {
     std::string id;
     if (iss >> id) {
         char * end;
@@ -77,22 +77,22 @@ std::string CmdParser::rm(std::istringstream & iss) {
     return "Remove failed.\n";
 }
 
-std::string CmdParser::clear(std::istringstream &) {
+std::string CmdParser::clear(std::istream &) {
     _player.clear();
     return "";
 }
 
-std::string CmdParser::next(std::istringstream &) {
+std::string CmdParser::next(std::istream &) {
     _player.next();
     return "";
 }
 
-std::string CmdParser::pause(std::istringstream &) {
+std::string CmdParser::pause(std::istream &) {
     _player.togglePause();
     return "";
 }
 
-std::string CmdParser::volume(std::istringstream & iss) {
+std::string CmdParser::volume(std::istream & iss) {
     Player::Volume value;
 
     if (iss >> value) {
@@ -102,7 +102,7 @@ std::string CmdParser::volume(std::istringstream & iss) {
     return "Volume = " + std::to_string(_player.volume()) + "\n";
 }
 
-std::string CmdParser::progress(std::istringstream & iss) {
+std::string CmdParser::progress(std::istream & iss) {
     double dur = _player.duration();
     double time = _player.timePos();
     std::ostringstream oss;
@@ -111,7 +111,7 @@ std::string CmdParser::progress(std::istringstream & iss) {
     return oss.str();
 }
 
-std::string CmdParser::current(std::istringstream &) {
+std::string CmdParser::current(std::istream &) {
     std::ostringstream oss;
     if (_player.hasCurrent()) {
         WebMusic wm{_player.current()};
@@ -121,7 +121,7 @@ std::string CmdParser::current(std::istringstream &) {
     return oss.str();
 }
 
-std::string CmdParser::state(std::istringstream &) {
+std::string CmdParser::state(std::istream &) {
     std::ostringstream oss;
     oss << std::boolalpha;
     oss << "States: hasCurrent=" << _player.hasCurrent();
@@ -129,7 +129,7 @@ std::string CmdParser::state(std::istringstream &) {
     return oss.str();
 }
 
-std::string CmdParser::random(std::istringstream &) {
+std::string CmdParser::random(std::istream &) {
 		bool ok = false;
     if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
     else                               ok = _player.addRandom();
@@ -137,7 +137,7 @@ std::string CmdParser::random(std::istringstream &) {
     return "The playlist is full.\n";
 }
 
-std::string CmdParser::pl(std::istringstream & iss) {
+std::string CmdParser::pl(std::istream & iss) {
 	std::string fn;
 	iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
@@ -146,18 +146,18 @@ std::string CmdParser::pl(std::istringstream & iss) {
     return "Invalid playlist name.\n";
 }
 
-std::string CmdParser::plcur(std::istringstream & iss) {
+std::string CmdParser::plcur(std::istream & iss) {
 	if(_archive) return _archive->name() + "\n";
 	return "~\n";
 }
 
-std::string CmdParser::plquit(std::istringstream &) {
+std::string CmdParser::plquit(std::istream &) {
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive.reset();
 	return "Entering default playlist\n";
 }
 
-std::string CmdParser::pllist(std::istringstream &) {
+std::string CmdParser::pllist(std::istream &) {
     auto playlists = _archivemgr.list();
     std::ostringstream oss;
     oss << "Available playlists:" << std::endl;
@@ -166,7 +166,24 @@ std::string CmdParser::pllist(std::istringstream &) {
     return oss.str();
 }
 
-std::string CmdParser::auth(std::istringstream & iss) {
+std::string CmdParser::subscribe(std::istream &) {
+	bool ok = _player.subscribe({reinterpret_cast<std::size_t>(this),
+		[&]{
+			std::istringstream dummy;
+			random(dummy);
+		}
+	});
+	if(!ok)	return "You are already subscribed\n";
+	return "You are now subscribed to automatically insert new musics\n";
+}
+
+std::string CmdParser::unsubscribe(std::istream &) {
+	bool ok = _player.unsubscribe({reinterpret_cast<std::size_t>(this), []{}});
+	if(!ok)	return "You were not subscribed\n";
+	return "You are now unsubscribed from automatically inserting new musics\n";
+}
+
+std::string CmdParser::auth(std::istream & iss) {
 	std::string token;
 	iss >> token;
 	_auth = TokenMgr::instance().isValid(token);
