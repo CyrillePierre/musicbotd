@@ -40,23 +40,25 @@ public:
 
 		iss >> cmd;
 
-    if (cmd == "add")       return _this->add(iss);
-    if (cmd == "list")      return _this->list(iss);
-    if (cmd == "rm")        return _this->rm(iss);
-    if (cmd == "clear")     return _this->clear(iss);
-    if (cmd == "next")      return _this->next(iss);
-    if (cmd == "pause")     return _this->pause(iss);
-    if (cmd == "volume")    return _this->volume(iss);
-    if (cmd == "progress")  return _this->progress(iss);
-    if (cmd == "current")   return _this->current(iss);
-    if (cmd == "state")     return _this->state(iss);
-    if (cmd == "random")    return _this->random(iss);
-		if (cmd == "pl")        return _this->pl(iss);
-		if (cmd == "plcur")     return _this->plcur(iss);
-		if (cmd == "plquit")    return _this->plquit(iss);
-		if (cmd == "help")      return help(iss);
-    if (cmd == "pllist")    return _this->pllist(iss);
-		if (cmd == "auth")      return _this->auth(iss);
+    if (cmd == "add")         return _this->add(iss);
+    if (cmd == "list")        return _this->list(iss);
+    if (cmd == "rm")          return _this->rm(iss);
+    if (cmd == "clear")       return _this->clear(iss);
+    if (cmd == "next")        return _this->next(iss);
+    if (cmd == "pause")       return _this->pause(iss);
+    if (cmd == "volume")      return _this->volume(iss);
+    if (cmd == "progress")    return _this->progress(iss);
+    if (cmd == "current")     return _this->current(iss);
+    if (cmd == "state")       return _this->state(iss);
+    if (cmd == "random")      return _this->random(iss);
+		if (cmd == "pl")          return _this->pl(iss);
+		if (cmd == "plcur")       return _this->plcur(iss);
+		if (cmd == "plquit")      return _this->plquit(iss);
+		if (cmd == "help")        return help(iss);
+    if (cmd == "pllist")      return _this->pllist(iss);
+		if (cmd == "subscribe")	  return _this->subscribe(iss);
+		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
+		if (cmd == "auth")        return _this->auth(iss);
 		if (_auth) {
 			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
 			if (cmd == "time")			return [&]{
@@ -92,6 +94,8 @@ private:
  state             Show the current states of the player.
  progress          Show the current position in the current music.
  current           Show the current video name.
+ subscribe				 Subscribe to automatically insert musics
+ unsubscribe			 Unsubscribe to automatically insert musics
  auth token        Authenticate with a specified token
  tts lang text     [auth] Text-to-Speech
  time							 [auth] Announce time (fr)

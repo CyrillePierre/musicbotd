@@ -253,6 +253,34 @@ WebMusic Player::current() {
     return WebMusic{id.substr(id.size() - cfg::ytIdSize), title};
 }
 
+bool Player::subscribe(Subscriber const&subscriber) {
+	{
+		Lock innerLock{_subscribersMutex};
+		Subscribers::const_iterator it = std::find_if(std::begin(_subscribers), std::end(_subscribers),
+			[&](Subscriber const&current) {
+				return std::get<0>(current) == std::get<0>(subscriber);
+			}
+		);
+		if(it != std::end(_subscribers)) return false;
+		_subscribers.push_back(subscriber);
+	}
+	// the function below takes the _subscribersMutex
+	processSubscriptions(1);
+	return true;
+}
+
+bool Player::unsubscribe(Subscriber const&subscriber) {
+	Lock innerLock{_subscribersMutex};
+	Subscribers::const_iterator it = std::find_if(std::begin(_subscribers), std::end(_subscribers),
+		[&](Subscriber const&current) {
+			return std::get<0>(current) == std::get<0>(subscriber);
+		}
+	);
+	if(it == std::end(_subscribers)) return false;
+	_subscribers.erase(it);
+	return true;
+}
+
 std::ostream &operator<<(std::ostream &os, Player const&player) {
 	nlohmann::json json;
 	json["volume"] = player.volume();
@@ -285,6 +313,7 @@ std::istream &operator>>(std::istream &is, Player &player) {
 	} catch(std::exception &e) {
 		player._lg(elog::err) << "cannot load state: " << e.what();
 	}
+	return is;
 }
 
 void Player::run() {
@@ -320,6 +349,7 @@ void Player::asyncPlayNext() {
     std::thread([this, playLock = std::move(lock)] {
         WebMusic currentMusic;
         _isPlaying = false;
+				processSubscriptions(2);
         {
             Lock lock{_mutex};
             _cv.wait(lock, [this] { return !_playlist.empty() || !_started; });
@@ -338,4 +368,25 @@ void Player::asyncPlayNext() {
 void Player::sendEvent(PlayerEvt pe, util::Any && any) {
     _lg << "sending event: " << (int)pe;
     if (_evtFn) _evtFn(pe, std::move(any));
+}
+
+void Player::processSubscriptions(std::size_t n) {
+	bool hasSubscriber;
+	Subscriber subscriber;
+	do {
+		hasSubscriber = false;
+		{
+			Lock lock{_mutex};
+			if(_playlist.size() < n) {
+				Lock innerLock{_subscribersMutex};
+				if((hasSubscriber = _subscribers.size())) {
+					subscriber = _subscribers.front();
+					_subscribers.pop_front();
+					_subscribers.push_back(subscriber);
+				}
+			}
+		}
+		// run this *after* unlocking _mutex because the call requires to take it
+		if(hasSubscriber) std::get<1>(subscriber)();
+	} while(hasSubscriber);
 }

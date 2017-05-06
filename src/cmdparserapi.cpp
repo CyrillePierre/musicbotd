@@ -193,6 +193,21 @@ std::string CmdParserAPI::pllist(std::istringstream & iss) {
 	return json.dump() + "\n";
 }
 
+std::string CmdParserAPI::subscribe(std::istringstream &) {
+	_player.subscribe({reinterpret_cast<std::size_t>(this),
+		[&]{
+			std::istringstream dummy;
+			random(dummy);
+		}
+	});
+	return "\n";
+}
+
+std::string CmdParserAPI::unsubscribe(std::istringstream &) {
+	_player.unsubscribe({reinterpret_cast<std::size_t>(this), []{}});
+	return "\n";
+}
+
 std::string CmdParserAPI::auth(std::istringstream & iss) {
 	std::string token;
 	iss >> token;

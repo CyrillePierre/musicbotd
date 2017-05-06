@@ -166,6 +166,23 @@ std::string CmdParser::pllist(std::istringstream &) {
     return oss.str();
 }
 
+std::string CmdParser::subscribe(std::istringstream &) {
+	bool ok = _player.subscribe({reinterpret_cast<std::size_t>(this),
+		[&]{
+			std::istringstream dummy;
+			random(dummy);
+		}
+	});
+	if(!ok)	return "You are already subscribed\n";
+	return "You are now subscribed to automatically insert new musics\n";
+}
+
+std::string CmdParser::unsubscribe(std::istringstream &) {
+	bool ok = _player.unsubscribe({reinterpret_cast<std::size_t>(this), []{}});
+	if(!ok)	return "You were not subscribed\n";
+	return "You are now unsubscribed from automatically inserting new musics\n";
+}
+
 std::string CmdParser::auth(std::istringstream & iss) {
 	std::string token;
 	iss >> token;

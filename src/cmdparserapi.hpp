@@ -24,6 +24,8 @@ private:
     std::string plcur(std::istringstream & iss);
     std::string plquit(std::istringstream & iss);
     std::string pllist(std::istringstream & iss);
+    std::string subscribe(std::istringstream & iss);
+    std::string unsubscribe(std::istringstream & iss);
 		std::string auth(std::istringstream & iss);
 
     friend CmdParserBase<CmdParserAPI>;
