@@ -28,16 +28,17 @@ enum PlayerEvt {
  * This class allows to execute a player to play music with a playlist of URLs.
  */
 struct Player {
-    using Playlist = std::list<WebMusic>;
-    using Volume = double;
-    using PlayListView = std::vector<Playlist::const_iterator>;
-    using Lock = std::unique_lock<std::mutex>;
-    using EventHandler = std::function<void(PlayerEvt, util::Any)>;
+	using Playlist = std::list<WebMusic>;
+	using Volume = double;
+	using PlayListView = std::vector<Playlist::const_iterator>;
+	using Lock = std::unique_lock<std::mutex>;
+	using EventHandler = std::function<void(PlayerEvt, util::Any)>;
 	using Subscriber = std::pair<std::size_t, std::function<void()>>;
 	using Subscribers = std::deque<Subscriber>;
 
 public:
-    static constexpr std::size_t playlistMaxSize = 100;
+	static constexpr std::size_t playlistMinSize = 2; // see subscriptions
+	static constexpr std::size_t playlistMaxSize = 100;
 
 private:
     Playlist                _playlist;

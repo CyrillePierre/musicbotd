@@ -87,63 +87,67 @@ util::Optional<WebMusic> Player::addRandom() {
 }
 
 void Player::remove(Playlist::const_iterator it) {
-    _lg(elog::trace) << "remove(iterator = " << &it << ')';
-    WebMusic wm = std::move(*it);
-    {
-        Lock lock{_mutex};
-        _plv.clear();
-        _playlist.erase(it);
-    }
-    sendEvent(PlayerEvt::removed, std::move(wm));
+	_lg(elog::trace) << "remove(iterator = " << &it << ')';
+	WebMusic wm = std::move(*it);
+	{
+		Lock lock{_mutex};
+		_plv.clear();
+		_playlist.erase(it);
+	}
+	sendEvent(PlayerEvt::removed, std::move(wm));
+	processSubscriptions(playlistMinSize);
 }
 
 util::Optional<WebMusic> Player::remove(std::string const & id) {
-    _lg(elog::trace) << "remove(" << id << ')';
+	_lg(elog::trace) << "remove(" << id << ')';
 
-    Playlist::iterator it = std::find_if(_playlist.begin(), _playlist.end(),
-        [&id] (WebMusic const & m) { return m.id() == id; });
-    if (it != _playlist.end()) {
-        auto music = util::makeOptional(std::move(*it));
+	Playlist::iterator it = std::find_if(_playlist.begin(), _playlist.end(),
+		[&id] (WebMusic const & m) { return m.id() == id; });
+	if (it != _playlist.end()) {
+		auto music = util::makeOptional(std::move(*it));
 
-        {
-            Lock lock{_mutex};
-            _plv.clear();
-            _playlist.erase(it);
-        }
-        sendEvent(PlayerEvt::removed, music.get());
-        return music;
-    }
-    return util::Optional<WebMusic>{};
+		{
+			Lock lock{_mutex};
+			_plv.clear();
+			_playlist.erase(it);
+		}
+		sendEvent(PlayerEvt::removed, music.get());
+		processSubscriptions(playlistMinSize);
+		return music;
+	}
+	return util::Optional<WebMusic>{};
 }
 
 util::Optional<WebMusic> Player::remove(std::size_t index) {
-    _lg(elog::trace) << "remove(" << index << ')';
+	_lg(elog::trace) << "remove(" << index << ')';
 
-    _mutex.lock();
-    std::size_t size = _plv.size();
-    _mutex.unlock();
+	_mutex.lock();
+	std::size_t size = _plv.size();
+	_mutex.unlock();
 
-    if (index < size) {
-        _mutex.lock();
-        Playlist::const_iterator it = _plv[index];
-        auto music = util::makeOptional(std::move(*it));
-        _plv.clear();
-        _playlist.erase(it);
-        _mutex.unlock();
-        sendEvent(PlayerEvt::removed, music.get());
-        return music;
-    }
-    return util::Optional<WebMusic>{};
+	if (index < size) {
+		_mutex.lock();
+		Playlist::const_iterator it = _plv[index];
+		auto music = util::makeOptional(std::move(*it));
+		_plv.clear();
+		_playlist.erase(it);
+		_mutex.unlock();
+		sendEvent(PlayerEvt::removed, music.get());
+		processSubscriptions(playlistMinSize);
+		return music;
+	}
+	return util::Optional<WebMusic>{};
 }
 
 void Player::clear() {
-    _lg(elog::trace) << "clear()";
-    {
-        Lock lock{_mutex};
-        _plv.clear();
-        _playlist.clear();
-    }
-    sendEvent(PlayerEvt::cleared);
+	_lg(elog::trace) << "clear()";
+	{
+		Lock lock{_mutex};
+		_plv.clear();
+		_playlist.clear();
+	}
+	sendEvent(PlayerEvt::cleared);
+	processSubscriptions(playlistMinSize);
 }
 
 void Player::start() {
@@ -265,7 +269,7 @@ bool Player::subscribe(Subscriber const&subscriber) {
 		_subscribers.push_back(subscriber);
 	}
 	// the function below takes the _subscribersMutex
-	processSubscriptions(1);
+	processSubscriptions(playlistMinSize);
 	return true;
 }
 
@@ -349,7 +353,7 @@ void Player::asyncPlayNext() {
     std::thread([this, playLock = std::move(lock)] {
         WebMusic currentMusic;
         _isPlaying = false;
-				processSubscriptions(2);
+				processSubscriptions(playlistMinSize+1);
         {
             Lock lock{_mutex};
             _cv.wait(lock, [this] { return !_playlist.empty() || !_started; });
@@ -388,5 +392,6 @@ void Player::processSubscriptions(std::size_t n) {
 		}
 		// run this *after* unlocking _mutex because the call requires to take it
 		if(hasSubscriber) std::get<1>(subscriber)();
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	} while(hasSubscriber);
 }
