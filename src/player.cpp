@@ -42,13 +42,13 @@ Player::Player(Archive & archive)
 }
 
 Player::~Player() {
-    _lg << "mpv destroy";
-    if (_started) {
-        mpv_terminate_destroy(_mpv);	// kill mpv
-        _mpvEventThread.join();			// wait mpv event thread
-//        Lock lock{_playMutex};			// wait playNext thread
-    }
-    _lg(elog::trace) << "~Player() end";
+	_lg << "mpv destroy";
+	if (_started) {
+		stop();
+		_mpvEventThread.join();			// wait mpv event thread
+		mpv_terminate_destroy(_mpv);	// kill mpv
+	}
+	_lg(elog::trace) << "~Player() end";
 }
 
 bool Player::add(std::string const & id, std::string const & name) {
@@ -325,7 +325,7 @@ void Player::run() {
 
     _lg << "mpv thread created";
     while (_started) {
-        mpv_event *evt = mpv_wait_event(_mpv, 10000);
+        mpv_event *evt = mpv_wait_event(_mpv, 1); // timeout in s
         if (evt->event_id != MPV_EVENT_LOG_MESSAGE)
             _lg(elog::dbg) << "mpv event: " << mpv_event_name(evt->event_id);
 
