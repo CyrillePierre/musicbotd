@@ -45,6 +45,31 @@ std::string CmdParserAPI::add(std::istream & iss) {
 	return error(errmsg) + "\n";
 }
 
+std::string CmdParserAPI::auth(std::istream & iss) {
+	std::string token;
+	iss >> token;
+	if(!(_auth = TokenMgr::instance().isValid(token)))
+		return error("Authentication failed") + "\n";
+	return "";
+}
+
+std::string CmdParserAPI::clear(std::istream &) {
+	_player.clear();
+	return "";
+}
+
+std::string CmdParserAPI::current(std::istream &) {
+	nlohmann::json json = nlohmann::json::object();
+	json["event"] = Event::Current;
+	if(_player.hasCurrent()) {
+		auto const current = _player.current();
+		json["value"]["id"] = current.id();
+		json["value"]["title"] = current.title();
+	} else
+		json["no_current"] = "";
+	return json.dump() + "\n";
+}
+
 std::string CmdParserAPI::list(std::istream & iss) {
 	std::size_t nbLines;
 	Player::PlayListView const * plv;
@@ -65,6 +90,72 @@ std::string CmdParserAPI::list(std::istream & iss) {
 		json["value"] += item;
 	}
 	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::next(std::istream &) {
+	_player.next();
+	return "";
+}
+
+std::string CmdParserAPI::pause(std::istream &) {
+	_player.togglePause();
+	return "";
+}
+
+std::string CmdParserAPI::pl(std::istream & iss) {
+	std::string fn;
+	iss >> fn;
+	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive = _archivemgr.load(fn);
+	if (_archive) {
+		nlohmann::json json;
+		json["event"] = Event::PlayListEnter;
+		json["value"] = fn;
+		return json.dump() + "\n";
+	}
+	return error("Invalid playlist name") + "\n";
+}
+
+std::string CmdParserAPI::plcur(std::istream &) {
+	nlohmann::json json;
+	json["event"] = Event::PlayListCurrent;
+	if(_archive) json["value"] = _archive->name();
+	else         json["value"] = "~";
+	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::pllist(std::istream & iss) {
+	auto playlists = _archivemgr.list();
+	nlohmann::json json;
+	json["event"] = Event::PlayListList;
+	json["value"] = nlohmann::json::array();
+	for (auto const & elem : playlists)
+		json["value"] += elem;
+	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::plquit(std::istream &) {
+	nlohmann::json json;
+	json["event"] = Event::PlayListQuit;
+	if(_archive) _archivemgr.unload(std::move(_archive));
+	_archive.reset();
+	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::progress(std::istream & iss) {
+	nlohmann::json json;
+	json["event"] = Event::Progress;
+	json["value"]["current"] = _player.timePos();
+	json["value"]["total"] = _player.duration();
+	return json.dump() + "\n";
+}
+
+std::string CmdParserAPI::random(std::istream &) {
+	bool ok = false;
+	if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
+	else                               ok = _player.addRandom();
+	if(ok) return "";
+	return error("The playlist is full.") + "\n";
 }
 
 std::string CmdParserAPI::rm(std::istream & iss) {
@@ -90,106 +181,10 @@ std::string CmdParserAPI::rm(std::istream & iss) {
 	return error(errmsg) + "\n";
 }
 
-std::string CmdParserAPI::clear(std::istream &) {
-	_player.clear();
-	return "";
-}
-
-std::string CmdParserAPI::next(std::istream &) {
-	_player.next();
-	return "";
-}
-
-std::string CmdParserAPI::pause(std::istream &) {
-	_player.togglePause();
-	return "";
-}
-
-std::string CmdParserAPI::volume(std::istream & iss) {
-	nlohmann::json json;
-	Player::Volume value;
-
-	json["event"] = Event::Volume;
-	if (iss >> value) {
-		_player.incrVolume(value);
-		return "";
-	} else
-		json["value"] = _player.volume();
-	return json.dump() + "\n";
-}
-
-std::string CmdParserAPI::progress(std::istream & iss) {
-	nlohmann::json json;
-	json["event"] = Event::Progress;
-	json["value"]["current"] = _player.timePos();
-	json["value"]["total"] = _player.duration();
-	return json.dump() + "\n";
-}
-
-std::string CmdParserAPI::current(std::istream &) {
-	nlohmann::json json = nlohmann::json::object();
-	json["event"] = Event::Current;
-	if(_player.hasCurrent()) {
-		auto const current = _player.current();
-		json["value"]["id"] = current.id();
-		json["value"]["title"] = current.title();
-	} else
-		json["no_current"] = "";
-	return json.dump() + "\n";
-}
-
 std::string CmdParserAPI::state(std::istream &) {
 	nlohmann::json json;
 	json["event"] = Event::State;
 	json["value"] = _player.isPaused();
-	return json.dump() + "\n";
-}
-
-std::string CmdParserAPI::random(std::istream &) {
-	bool ok = false;
-	if(_archive && !_archive->empty()) ok = _player.add(_archive->random());
-	else                               ok = _player.addRandom();
-	if(ok) return "";
-	return error("The playlist is full.") + "\n";
-}
-
-std::string CmdParserAPI::pl(std::istream & iss) {
-	std::string fn;
-	iss >> fn;
-	if(_archive) _archivemgr.unload(std::move(_archive));
-	_archive = _archivemgr.load(fn);
-	if (_archive) {
-		nlohmann::json json;
-		json["event"] = Event::PlayListEnter;
-		json["value"] = fn;
-		return json.dump() + "\n";
-	}
-	return error("Invalid playlist name") + "\n";
-}
-
-std::string CmdParserAPI::plcur(std::istream &) {
-	nlohmann::json json;
-	json["event"] = Event::PlayListCurrent;
-	if(_archive) json["value"] = _archive->name();
-	else         json["value"] = "~";
-	return json.dump() + "\n";
-}
-
-std::string CmdParserAPI::plquit(std::istream &) {
-	nlohmann::json json;
-	json["event"] = Event::PlayListQuit;
-	if(_archive) _archivemgr.unload(std::move(_archive));
-	_archive.reset();
-	return json.dump() + "\n";
-}
-
-std::string CmdParserAPI::pllist(std::istream & iss) {
-	auto playlists = _archivemgr.list();
-	nlohmann::json json;
-	json["event"] = Event::PlayListList;
-	json["value"] = nlohmann::json::array();
-	for (auto const & elem : playlists)
-		json["value"] += elem;
 	return json.dump() + "\n";
 }
 
@@ -220,10 +215,15 @@ std::string CmdParserAPI::unsubscribe(std::istream &) {
 	return error("You were not subscribed") + "\n";
 }
 
-std::string CmdParserAPI::auth(std::istream & iss) {
-	std::string token;
-	iss >> token;
-	if(!(_auth = TokenMgr::instance().isValid(token)))
-		return error("Authentication failed") + "\n";
-	return "";
+std::string CmdParserAPI::volume(std::istream & iss) {
+	nlohmann::json json;
+	Player::Volume value;
+
+	json["event"] = Event::Volume;
+	if (iss >> value) {
+		_player.incrVolume(value);
+		return "";
+	} else
+		json["value"] = _player.volume();
+	return json.dump() + "\n";
 }

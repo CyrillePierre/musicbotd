@@ -45,26 +45,25 @@ public:
 		iss >> cmd;
 
     if (cmd == "add")         return _this->add(iss);
-    if (cmd == "list")        return _this->list(iss);
-    if (cmd == "rm")          return _this->rm(iss);
+		if (cmd == "auth")        return _this->auth(iss);
     if (cmd == "clear")       return _this->clear(iss);
+    if (cmd == "current")     return _this->current(iss);
+		if (cmd == "help")        return help(iss);
+    if (cmd == "list")        return _this->list(iss);
     if (cmd == "next")        return _this->next(iss);
     if (cmd == "pause")       return _this->pause(iss);
-    if (cmd == "volume")      return _this->volume(iss);
-    if (cmd == "progress")    return _this->progress(iss);
-    if (cmd == "current")     return _this->current(iss);
-    if (cmd == "state")       return _this->state(iss);
-    if (cmd == "random")      return _this->random(iss);
 		if (cmd == "pl")          return _this->pl(iss);
 		if (cmd == "plcur")       return _this->plcur(iss);
-		if (cmd == "plquit")      return _this->plquit(iss);
-		if (cmd == "help")        return help(iss);
     if (cmd == "pllist")      return _this->pllist(iss);
+		if (cmd == "plquit")      return _this->plquit(iss);
+    if (cmd == "progress")    return _this->progress(iss);
+    if (cmd == "random")      return _this->random(iss);
+    if (cmd == "rm")          return _this->rm(iss);
+    if (cmd == "state")       return _this->state(iss);
 		if (cmd == "subscribe")	  return _this->subscribe(iss);
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
-		if (cmd == "auth")        return _this->auth(iss);
+    if (cmd == "volume")      return _this->volume(iss);
 		if (_auth) {
-			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
 			if (cmd == "time")			return [&]{
 				std::time_t t = std::time(nullptr);
 				std::tm tm = *std::localtime(&t);
@@ -74,6 +73,7 @@ public:
 				speak("fr", oss.str());
 				return "";
 			}();
+			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
 		}
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
@@ -84,25 +84,26 @@ private:
     std::string help(std::istringstream &) {
         return R"#(Available commands:
  add (<id>|<url>)  Add a video ID or URL of youtube video in the playlist.
- rm (<index>|<id>) Remove a video by ID or index of youtube video in the playlist.
- next              Pass to the next music.
- vol <value>       Increment the volume with the corresponding <value> (in %).
- pause             Pause the current music.
+ auth token        Authenticate with a specified token
+ clear             Remove all the playlist.
+ current           Show the current video name.
  list [<N>]        List the <N> next videos (all videos if <N> is omitted).
- random            Randomly select a music in archive file.
+ next              Pass to the next music.
+ pause             Pause the current music.
  pl <name>         Enter in the playlist <name>.
  plcur             Display the current playlist.
- plquit            Enter the global playlist.
  pllist            List all existing playlists.
- clear             Remove all the playlist.
- state             Show the current states of the player.
+ plquit            Enter the global playlist.
  progress          Show the current position in the current music.
- current           Show the current video name.
- subscribe				 Subscribe to automatically insert musics
- unsubscribe			 Unsubscribe to automatically insert musics
- auth token        Authenticate with a specified token
- tts lang text     [auth] Text-to-Speech
- time							 [auth] Announce time (fr)
+ random            Randomly select a music in archive file.
+ rm (<index>|<id>) Remove a video by ID or index of youtube video in the playlist.
+ state             Show the current states of the player.
+ subscribe         Subscribe to automatically insert musics
+ unsubscribe       Unsubscribe to automatically insert musics
+ vol <value>       Increment the volume with the corresponding <value> (in %).
+ ----------------- Require authentification:
+ time              Announce time (fr)
+ tts lang text     Text-to-Speech
 )#";
     }
 
