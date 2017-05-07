@@ -4,6 +4,13 @@
 
 class CmdParserAPI: public CmdParserBase<CmdParserAPI> {
 public:
+	enum Event: int {
+		Unsubscribe = -6, Subscribe = -5, Current = -3, Progress = -2, List = -1,
+		Volume = 3, State = 4,
+		PlayListEnter = 10, PlayListCurrent = 11, PlayListList = 12, PlayListQuit = 19
+	};
+	
+public:
     CmdParserAPI(Player & player, ArchiveMgr & archivemgr);
 
 private:

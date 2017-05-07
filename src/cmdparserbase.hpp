@@ -29,6 +29,10 @@ public:
 		_this{static_cast<Impl*>(this)}, _player{player}, _archivemgr{archivemgr}, _auth{false} {}
 
 	~CmdParserBase() {
+		{
+			std::istringstream dummy{};
+			_this->unsubscribe(dummy);
+		}
 		if(_archive) _archivemgr.unload(std::move(_archive));
 	}
 
