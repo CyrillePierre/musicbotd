@@ -53,6 +53,22 @@ WebMusic Archive::random() const {
     return WebMusic{it->first, it->second};
 }
 
+std::vector<WebMusic> Archive::search(std::string const&s) const {
+	Lock lock{_musicsMutex};
+	std::vector<WebMusic> l;
+
+	for(auto const&pair: _musics) {
+		std::string const&title = std::get<1>(pair);
+		if(std::search(	std::begin(title), std::end(title),
+										std::begin(s), std::end(s),
+										[](char lhs, char rhs) { return std::toupper(lhs) == std::toupper(rhs); })
+			!= std::end(title))
+			l.push_back({std::get<0>(pair), title});
+	}
+
+	return l;
+}
+
 void Archive::flush() {
     _lg(elog::trace) << "flush()";
     std::ofstream file{_filename};

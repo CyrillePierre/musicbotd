@@ -61,6 +61,8 @@ public:
     Player(Archive & archive);
     ~Player();
 
+		Archive const&archive() const { return _archive; }
+
     bool add(std::string const & id, std::string const & name);
     bool add(WebMusic const & m);
     util::Optional<WebMusic> addRandom();

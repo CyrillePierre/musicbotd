@@ -23,6 +23,7 @@ private:
 	std::string progress(std::istream & iss);
 	std::string random(std::istream & iss);
 	std::string rm(std::istream & iss);
+	std::string search(std::istream & iss);
 	std::string state(std::istream & iss);
 	std::string subscribe(std::istream & iss);
 	std::string unsubscribe(std::istream & iss);

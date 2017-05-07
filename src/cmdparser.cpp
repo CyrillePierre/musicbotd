@@ -153,6 +153,25 @@ std::string CmdParser::rm(std::istream & iss) {
 	return "Remove failed.\n";
 }
 
+std::string CmdParser::search(std::istream & is) {
+	std::string search;
+	std::getline(is, search);
+
+	std::vector<WebMusic> list;
+	if(_archive && !_archive->empty())	list = _archive->search(search);
+	else																list = _player.archive().search(search);
+
+	std::ostringstream oss;
+	oss << "Matched musics: \n";
+	std::transform(std::begin(list), std::end(list), std::ostream_iterator<std::string>(oss),
+		[](WebMusic const&wm) {
+			return std::string{"- "}+wm.id()+" "+wm.title()+"\n";
+		}
+	);
+
+	return oss.str();
+}
+
 std::string CmdParser::state(std::istream &) {
 	std::ostringstream oss;
 	oss << std::boolalpha;

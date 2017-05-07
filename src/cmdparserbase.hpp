@@ -59,6 +59,7 @@ public:
     if (cmd == "progress")    return _this->progress(iss);
     if (cmd == "random")      return _this->random(iss);
     if (cmd == "rm")          return _this->rm(iss);
+		if (cmd == "search")			return _this->search(iss);
     if (cmd == "state")       return _this->state(iss);
 		if (cmd == "subscribe")	  return _this->subscribe(iss);
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);

@@ -181,6 +181,30 @@ std::string CmdParserAPI::rm(std::istream & iss) {
 	return error(errmsg) + "\n";
 }
 
+std::string CmdParserAPI::search(std::istream & is) {
+	std::string search;
+	std::getline(is, search);
+
+	std::vector<WebMusic> list;
+	if(_archive && !_archive->empty())	list = _archive->search(search);
+	else																list = _player.archive().search(search);
+
+	nlohmann::json json;
+	json["event"] = Event::Search;
+	json["value"] = nlohmann::json::array();
+
+	std::size_t i{};
+	for (WebMusic const & wm : list) {
+		nlohmann::json item = nlohmann::json::object();
+		item["index"] = i++;
+		item["id"] = wm.id();
+		item["title"] = wm.title();
+		_lg(elog::trace) << "list += [" << wm.id() << "] " << wm.title();
+		json["value"] += item;
+	}
+	return json.dump() + "\n";
+}
+
 std::string CmdParserAPI::state(std::istream &) {
 	nlohmann::json json;
 	json["event"] = Event::State;
