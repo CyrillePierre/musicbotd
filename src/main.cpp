@@ -80,9 +80,9 @@ int main() try {
 	serverAPI.connect();
 
 	server.asyncAcceptLoop(std::bind(
-		applyFunction<CmdParser, elog::msg>, std::ref(player), std::ref(archivemgr), _1));
+		applyFunction<CmdParser, elog::msg>, std::ref(player), std::ref(archivemgr), _1), signalReceived);
 	serverAPI.asyncAcceptLoop(std::bind(
-		applyFunction<CmdParserAPI, elog::dbg>, std::ref(player), std::ref(archivemgr), _1));
+		applyFunction<CmdParserAPI, elog::dbg>, std::ref(player), std::ref(archivemgr), _1), signalReceived);
 
 	l << "starting player";
 	player.setEventHandler([&] (PlayerEvt evt, util::Any any) {

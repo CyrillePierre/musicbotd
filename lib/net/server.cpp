@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
 
 extern "C" {
 #include "signal.h"
@@ -21,8 +22,14 @@ static void sigpipe(int) {}
 #define ERROR_IF(FUNCTION) \
     if (FUNCTION) { perror(#FUNCTION); exit(errno); }
 
-net::Server::Server(int port) : _port(port) {
-    signal(SIGPIPE, &sigpipe);
+net::Server::Server(int port):
+	_port(port),
+	_threadAccept{false, std::thread{}} {
+	signal(SIGPIPE, &sigpipe);
+}
+
+net::Server::~Server() {
+	if(std::get<0>(_threadAccept)) std::get<1>(_threadAccept).join();
 }
 
 void net::Server::connect()
@@ -35,6 +42,7 @@ void net::Server::connect()
 
     /* Avoid "address already in use" */
     ERROR_IF(setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &tr, sizeof(int)) == -1);
+		ERROR_IF(fcntl(_fd, F_SETFL, O_NONBLOCK) == -1);
  
     /* Initialisation de l'adresse */
     addr.sin_family		 = AF_INET;
@@ -66,7 +74,12 @@ net::Client const & net::Server::accept()
     socklen_t       clientlen = sizeof(client);
     int             newfd;
  
-    ERROR_IF((newfd = ::accept(_fd, &client, &clientlen)) == -1);
+		newfd = ::accept(_fd, &client, &clientlen);
+		if(newfd == -1) {
+			if(errno == EAGAIN || errno == EWOULDBLOCK) throw std::runtime_error{"error: would block"};
+			perror("newfd == -1");
+			exit(errno);
+		}
 
     _clientListMutex.lock();
 	auto clientPair = _clients.insert(Client(newfd));

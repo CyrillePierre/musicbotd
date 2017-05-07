@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 #include <mutex>
+
 #include "client.hpp"
 
 namespace net
@@ -28,10 +29,14 @@ private:
     int		   _fd;		// socket
     Clients	   _clients;	// Ensemble des clients connectés
     mutable std::mutex _clientListMutex;
+	std::pair<bool, std::thread> _threadAccept;
 
 public:
 	/** @brief Constructeur */
-    Server(int port);
+	Server(int port);
+
+	/** @brief Destructeur */
+	~Server();
 
 	/** @brief Démarrage du serveur */
 	void connect();
@@ -44,7 +49,7 @@ public:
 
 	/** @brief Attente asynchrone de connexion */
 	template <typename Callable>
-	void asyncAcceptLoop(Callable && fn);
+	void asyncAcceptLoop(Callable && fn, bool volatile &quit);
 
 	/** @brief Ecriture à tous les clients */
 	template <typename Buffer>
@@ -62,7 +67,7 @@ public:
  * @param fn : foncteur appelé à la connexion d'un client.
  */
 template <typename Callable>
-void net::Server::asyncAcceptLoop(Callable && fn)
+void net::Server::asyncAcceptLoop(Callable && fn, bool volatile &quit)
 {
 	auto clientFn = [&fn, this] (net::Client const & c) {
 		// Exécution de la tâche confié au client
@@ -73,11 +78,16 @@ void net::Server::asyncAcceptLoop(Callable && fn)
 	};
 
 	// Ce thread va exécuter en boucle la méthode accept()
-	std::thread([clientFn, this] () { 
-		while (1) {
-			accept().asyncRun(clientFn);
+	_threadAccept = {true,
+		std::thread([&quit, clientFn, this] () { 
+		while (!quit) {
+			try {
+				accept().asyncRun(clientFn);
+			} catch(std::runtime_error const&) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			}
 		}
-	}).detach();
+	})};
 }
 
 /**
