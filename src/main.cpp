@@ -55,8 +55,9 @@ int main() try {
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 
-	elog::cfg().logLevel(elog::trace);
+	elog::cfg().logLevel(elog::msg);
 	elog::cfg().timeEnabled(true);
+	elog::cfg().stream("/var/log/musicbotd.log");
 	elog::Logger l;
 
 	int port = 1937, portAPI = 1938;
