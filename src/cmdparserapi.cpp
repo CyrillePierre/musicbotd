@@ -183,7 +183,7 @@ std::string CmdParserAPI::rm(std::istream & iss) {
 
 std::string CmdParserAPI::search(std::istream & is) {
 	std::string search;
-	std::getline(is, search);
+	std::getline(is >> std::ws, search);
 
 	std::vector<WebMusic> list;
 	if(_archive && !_archive->empty())	list = _archive->search(search);

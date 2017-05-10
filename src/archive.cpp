@@ -123,6 +123,7 @@ void Archive::syncRoutine() {
 
 void Archive::fillMusicsView() const {
     _lg(elog::trace) << "fillMusicsView()";
+		Lock lock{_mvMutex};
     _mv.clear();
     for (auto it = _musics.cbegin(); it != _musics.end(); ++it)
         _mv.push_back(it);

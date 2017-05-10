@@ -155,7 +155,7 @@ std::string CmdParser::rm(std::istream & iss) {
 
 std::string CmdParser::search(std::istream & is) {
 	std::string search;
-	std::getline(is, search);
+	std::getline(is >> std::ws, search);
 
 	std::vector<WebMusic> list;
 	if(_archive && !_archive->empty())	list = _archive->search(search);
