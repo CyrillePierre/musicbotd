@@ -32,9 +32,6 @@ void Archive::add(WebMusic const & wm) {
     _musicsMutex.unlock();
     if (it.second) {
         _lg << "add to archive: " << wm.id();
-        _mvMutex.lock();
-        _mv.push_back(it.first);
-        _mvMutex.unlock();
         _changed = true;
     }
     else _lg << "already in archive: " << wm.id();
@@ -95,7 +92,7 @@ void Archive::load() {
     }
     _lg << "loaded: " << _musics.size() << " musics";
 
-    std::shuffle(_mv.begin(), _mv.end(), std::random_device{});
+		fillMusicsView();
 }
 
 void Archive::syncRoutine() {
@@ -109,8 +106,6 @@ void Archive::syncRoutine() {
             _lg(elog::dbg) << "wake: changed == true";
             _changed = false;
             flush();
-            Lock mvLock{_mvMutex};
-            std::shuffle(_mv.begin(), _mv.end(), std::random_device{});
         }
         else _lg(elog::trace) << "wake: nothing to do";
 
@@ -128,4 +123,3 @@ void Archive::fillMusicsView() const {
         _mv.push_back(it);
     std::shuffle(_mv.begin(), _mv.end(), std::random_device{});
 }
-
