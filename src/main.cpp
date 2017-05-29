@@ -10,7 +10,7 @@
 #include "eventviewer.hpp"
 #include "archivemgr.hpp"
 
-#define MB_BASE_PATH	"/var/lib/musicbotd/"
+#define MB_BASE_PATH	""
 
 namespace elog = ese::log;
 
@@ -55,9 +55,8 @@ int main() try {
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 
-	elog::cfg().logLevel(elog::msg);
+	elog::cfg().logLevel(elog::dbg);
 	elog::cfg().timeEnabled(true);
-	elog::cfg().stream("/var/log/musicbotd.log");
 	elog::Logger l;
 
 	int port = 1937, portAPI = 1938;

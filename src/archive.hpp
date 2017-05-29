@@ -49,5 +49,7 @@ private:
 	void flush();
 	void load();
 	void syncRoutine();
+
+	/* you must have a lock on _mvMutex before calling this function */
 	void fillMusicsView() const;
 };
