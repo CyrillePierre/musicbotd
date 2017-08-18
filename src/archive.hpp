@@ -11,7 +11,7 @@ class WebMusic;
 
 struct Archive {
 	using Musics = std::map<std::string, std::string>;
-	using MusicsView = std::deque<Musics::const_iterator>;
+	using MusicsView = std::deque<std::reference_wrapper<std::string const>>;
 	using Lock = std::unique_lock<std::mutex>;
 	using Cv   = std::condition_variable;
 
@@ -36,6 +36,7 @@ public:
 	Archive(std::string const & filename, std::string const & name = "~");
 	~Archive();
 	void add(WebMusic const & wm);
+	bool remove(std::string const & id);
 	WebMusic operator [] (std::string const &) const;
 	std::size_t size() const noexcept { return _musics.size(); }
 	WebMusic random() const;

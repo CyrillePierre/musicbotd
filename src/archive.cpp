@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <random>
+#include <list>
 #include "archive.hpp"
 #include "webmusic.hpp"
 
@@ -37,17 +38,37 @@ void Archive::add(WebMusic const & wm) {
     else _lg << "already in archive: " << wm.id();
 }
 
+bool Archive::remove(std::string const & id) {
+	Lock lock0{_musicsMutex, std::defer_lock}, lock1{_mvMutex, std::defer_lock};
+	std::lock(lock0, lock1);
+
+	auto rmIt = _musics.find(id);
+	if (rmIt == _musics.end()) return false;
+
+	// Remove the music from the random list
+	_mv.erase(std::find_if(_mv.begin(), _mv.end(),
+			[&id] (auto const & tmpId) { return tmpId.get() == id; }));
+
+	// Remove the music from the archive
+	_musics.erase(rmIt);
+
+	_changed = true;
+	return true;
+}
+
 WebMusic Archive::operator [] (std::string const & id) const {
     Lock lock{_musicsMutex};
     return WebMusic{id, _musics.at(id)};
 }
 
 WebMusic Archive::random() const {
-    Lock lock{_mvMutex};
+	Lock lock0{_musicsMutex, std::defer_lock}, lock1{_mvMutex, std::defer_lock};
+	std::lock(lock0, lock1);
+
     if (_mv.empty()) fillMusicsView();
-    auto it = _mv.front();
+	std::string const & id = _mv.front();
     _mv.pop_front();
-    return WebMusic{it->first, it->second};
+    return WebMusic{id, _musics.at(id)};
 }
 
 std::vector<WebMusic> Archive::search(std::string const&s) const {
@@ -57,8 +78,8 @@ std::vector<WebMusic> Archive::search(std::string const&s) const {
 	for(auto const&pair: _musics) {
 		std::string const&title = std::get<1>(pair);
 		if(std::search(	std::begin(title), std::end(title),
-										std::begin(s), std::end(s),
-										[](char lhs, char rhs) { return std::toupper(lhs) == std::toupper(rhs); })
+					std::begin(s), std::end(s),
+					[](char lhs, char rhs) { return std::toupper(lhs) == std::toupper(rhs); })
 			!= std::end(title))
 			l.push_back({std::get<0>(pair), title});
 	}
@@ -88,7 +109,7 @@ void Archive::load() {
         file.get();
         file.getline(buf, 1024);
         auto it = _musics.insert({id, std::string{buf}});
-        if (it.second) _mv.push_back(it.first);
+        if (it.second) _mv.push_back(it.first->first);
     }
     _lg << "loaded: " << _musics.size() << " musics";
 
@@ -120,6 +141,6 @@ void Archive::fillMusicsView() const {
     _lg(elog::trace) << "fillMusicsView()";
     _mv.clear();
     for (auto it = _musics.cbegin(); it != _musics.end(); ++it)
-        _mv.push_back(it);
+        _mv.push_back(it->first);
     std::shuffle(_mv.begin(), _mv.end(), std::random_device{});
 }
