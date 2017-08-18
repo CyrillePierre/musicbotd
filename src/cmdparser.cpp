@@ -117,6 +117,26 @@ std::string CmdParser::plquit(std::istream &) {
 	return "Entering default playlist\n";
 }
 
+std::string CmdParser::plrm(std::istream & iss) {
+	std::string id;
+	if (!(iss >> id) || id.size() != cfg::ytIdSize) {
+		_lg(elog::warn) << "Remove failed: parsing error";
+		return "Remove failed: parsing error\n";
+	}
+
+	if (!_archive) {
+		_lg(elog::warn) << "Remove failed: no current playlist";
+		return "Remove failed: no current playlist\n";
+	}
+
+	if (!_archive->remove(id)) {
+		_lg(elog::warn) << "remove failed: unknown id '" << id << "'";
+		return "Remove failed: unknown id\n";
+	}
+
+	return "";
+}
+
 std::string CmdParser::progress(std::istream & iss) {
 	double dur = _player.duration();
 	double time = _player.timePos();

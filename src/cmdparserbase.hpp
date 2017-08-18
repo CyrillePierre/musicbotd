@@ -44,28 +44,29 @@ public:
 
 		iss >> cmd;
 
-    if (cmd == "add")         return _this->add(iss);
+		if (cmd == "add")         return _this->add(iss);
 		if (cmd == "auth")        return _this->auth(iss);
-    if (cmd == "clear")       return _this->clear(iss);
-    if (cmd == "current")     return _this->current(iss);
+		if (cmd == "clear")       return _this->clear(iss);
+		if (cmd == "current")     return _this->current(iss);
 		if (cmd == "help")        return help(iss);
-    if (cmd == "list")        return _this->list(iss);
-    if (cmd == "next")        return _this->next(iss);
-    if (cmd == "pause")       return _this->pause(iss);
+		if (cmd == "list")        return _this->list(iss);
+		if (cmd == "next")        return _this->next(iss);
+		if (cmd == "pause")       return _this->pause(iss);
 		if (cmd == "pl")          return _this->pl(iss);
 		if (cmd == "plcur")       return _this->plcur(iss);
-    if (cmd == "pllist")      return _this->pllist(iss);
+		if (cmd == "pllist")      return _this->pllist(iss);
+		if (cmd == "plrm")        return _this->plrm(iss);
 		if (cmd == "plquit")      return _this->plquit(iss);
-    if (cmd == "progress")    return _this->progress(iss);
-    if (cmd == "random")      return _this->random(iss);
-    if (cmd == "rm")          return _this->rm(iss);
-		if (cmd == "search")			return _this->search(iss);
-    if (cmd == "state")       return _this->state(iss);
+		if (cmd == "progress")    return _this->progress(iss);
+		if (cmd == "random")      return _this->random(iss);
+		if (cmd == "rm")          return _this->rm(iss);
+		if (cmd == "search")      return _this->search(iss);
+		if (cmd == "state")       return _this->state(iss);
 		if (cmd == "subscribe")	  return _this->subscribe(iss);
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
-    if (cmd == "volume")      return _this->volume(iss);
+		if (cmd == "volume")      return _this->volume(iss);
 		if (_auth) {
-			if (cmd == "time")			return [&]{
+			if (cmd == "time") {
 				std::time_t t = std::time(nullptr);
 				std::tm tm = *std::localtime(&t);
 				std::ostringstream oss;
@@ -73,8 +74,8 @@ public:
 				oss << std::put_time(&tm, "Il est %R");
 				speak("fr", oss.str());
 				return "";
-			}();
-			if (cmd == "tts")       return [&]{ tts(iss); return ""; }();
+			}
+			if (cmd == "tts") { tts(iss); return ""; }
 		}
 
 		_lg(elog::warn) << "unknown command '" << cmd << "'";
@@ -82,8 +83,8 @@ public:
 	}
 
 private:
-    std::string help(std::istringstream &) {
-        return R"#(Available commands:
+	std::string help(std::istringstream &) {
+		return R"#(Available commands:
  add (<id>|<url>)  Add a video ID or URL of youtube video in the playlist.
  auth token        Authenticate with a specified token
  clear             Remove all the playlist.
@@ -94,6 +95,7 @@ private:
  pl <name>         Enter in the playlist <name>.
  plcur             Display the current playlist.
  pllist            List all existing playlists.
+ plrm <id>         Remove a music by ID from the current playlist.
  plquit            Enter the global playlist.
  progress          Show the current position in the current music.
  random            Randomly select a music in archive file.
@@ -106,27 +108,27 @@ private:
  time              Announce time (fr)
  tts lang text     Text-to-Speech
 )#";
-    }
+	}
 
-		void speak(std::string lang, std::string text) {
-			bool mustPause = !_player.isPaused();
-			if(mustPause) _player.togglePause();
+	void speak(std::string lang, std::string text) {
+		bool mustPause = !_player.isPaused();
+		if(mustPause) _player.togglePause();
 
-			int pid;
-			if((pid = fork()) == 0) {
-				execlp("simple_google_tts", "simple_google_tts", lang.c_str(), text.c_str(), NULL);
-				exit(0);
-			}
-			waitpid(pid, NULL, 0);
-			if(mustPause) _player.togglePause();
+		int pid;
+		if((pid = fork()) == 0) {
+			execlp("simple_google_tts", "simple_google_tts", lang.c_str(), text.c_str(), NULL);
+			exit(0);
 		}
+		waitpid(pid, NULL, 0);
+		if(mustPause) _player.togglePause();
+	}
 
-		void tts(std::istringstream & iss) {
-			std::string lang, text;
-			iss >> lang;
-			std::getline(iss, text);
-			std::replace(text.begin(), text.end(), '"', '\'');
-			text = "\""+text.substr(0, 256)+"\"";
-			speak(lang, text);
-		}
+	void tts(std::istringstream & iss) {
+		std::string lang, text;
+		iss >> lang;
+		std::getline(iss, text);
+		std::replace(text.begin(), text.end(), '"', '\'');
+		text = "\""+text.substr(0, 256)+"\"";
+		speak(lang, text);
+	}
 };

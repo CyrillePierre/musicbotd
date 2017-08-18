@@ -142,6 +142,26 @@ std::string CmdParserAPI::plquit(std::istream &) {
 	return json.dump() + "\n";
 }
 
+std::string CmdParserAPI::plrm(std::istream & iss) {
+	std::string id;
+	if (!(iss >> id) || id.size() != cfg::ytIdSize) {
+		_lg(elog::warn) << "Remove failed: parsing error";
+		return error("Remove failed: parsing error") + "\n";
+	}
+
+	if (!_archive) {
+		_lg(elog::warn) << "Remove failed: no current playlist";
+		return error("Remove failed: no current playlist") + "\n";
+	}
+
+	if (!_archive->remove(id)) {
+		_lg(elog::warn) << "remove failed: unknown id '" << id << "'";
+		return error("Remove failed: unknown id") + "\n";
+	}
+
+	return "";
+}
+
 std::string CmdParserAPI::progress(std::istream & iss) {
 	nlohmann::json json;
 	json["event"] = Event::Progress;

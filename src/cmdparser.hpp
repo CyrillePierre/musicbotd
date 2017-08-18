@@ -20,6 +20,7 @@ private:
 	std::string plcur(std::istream & iss);
 	std::string pllist(std::istream & iss);
 	std::string plquit(std::istream & iss);
+	std::string plrm(std::istream & iss);
 	std::string progress(std::istream & iss);
 	std::string random(std::istream & iss);
 	std::string rm(std::istream & iss);

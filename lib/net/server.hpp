@@ -69,9 +69,9 @@ public:
 template <typename Callable>
 void net::Server::asyncAcceptLoop(Callable && fn, bool volatile &quit)
 {
-	auto clientFn = [&fn, this] (net::Client const & c) {
+	auto clientFn = [fn = std::forward<Callable>(fn), this] (net::Client const & c) {
 		// Exécution de la tâche confié au client
-		std::forward<Callable>(fn)(c);
+		fn(c);
 
 		// Quand le client s'est déconnecté, on le retire de la liste
 		_clients.erase(c);
