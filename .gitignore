@@ -1,0 +1,7 @@
+.*.swp
+*/build/
+*.user
+*.user.*
+*/b/
+gmon.out
+.ycm_extra_conf.py
