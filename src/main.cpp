@@ -12,6 +12,8 @@
 
 #define MB_BASE_PATH	""
 
+long const TIMEOUT = 30; // seconds
+
 namespace elog = ese::log;
 
 template<typename Parser, elog::LogLevel lglvl>
@@ -70,7 +72,7 @@ int main() try {
 		if(in) in >> player;
 	}
 
-	net::Server server{port}, serverAPI{portAPI};
+	net::Server server{port, TIMEOUT}, serverAPI{portAPI, TIMEOUT};
 
 	l << "server port (TCP): " << port;
 	l << "API server port (TCP): " << portAPI;
