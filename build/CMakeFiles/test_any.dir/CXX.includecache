@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../lib/util/any.hpp
+utility
+-
+type_traits
+-
+
+/home/cyrille/projects/software/musicbot/musicbotd/test/test_any.cpp
+iostream
+-
+string
+-
+cassert
+-
+util/any.hpp
+-
+

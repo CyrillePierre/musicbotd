@@ -15,14 +15,15 @@ namespace net {
  * @author Cyrille Pierre
  */
 class Client {
+	long const _timeout;
 	int _fd;	// Le file descriptor de la socket
     mutable std::mutex _mutex;
 
 public:
 	/** @brief Constructeur */
-    Client(int fd) : _fd(fd) {}
+    Client(int fd, long timeout) : _timeout{timeout}, _fd(fd) {}
     Client(Client const & c) = delete;
-    Client(Client && c) : _fd(c._fd) { c._fd = -1; }
+    Client(Client && c) : _timeout{c._timeout}, _fd(c._fd) { c._fd = -1; }
     ~Client() { close(); }
 
 	/** @brief Exécution de la gestion du client */
@@ -36,12 +37,10 @@ public:
     inline void close() const { if (_fd != -1) ::close(_fd); }
 
 	/** @brief Envoi de donnée au client. */
-	template <typename Buffer>
-	int write(Buffer && buf, std::size_t size) const;
+	int write(void const * buf, std::size_t size) const;
 
 	/** @brief Réception de données du client. */
-	template <typename Buffer>
-	int read(Buffer && buf, std::size_t size) const;
+	int read(void * buf, std::size_t size) const;
 
 	/** @brief Réception de données du client jusqu'à un délimiteur. */
 	template <typename Buffer>
@@ -64,28 +63,6 @@ inline void net::Client::asyncRun(Callable && callable) const {
 	std::thread(std::forward<Callable>(callable), std::cref(*this)).detach();
 }
 
-/**
- * Cette fonction est bloquante tant que les données n'ont pas été envoyées.
- * @param buf  : le buffer à envoyer chez le client.
- * @param size : la taille du buffer.
- * @return le nombre d'octets écrits ou -1 si une erreur s'est produite.
- */
-template <typename Buffer>
-inline int net::Client::write(Buffer && buf, std::size_t size) const {
-    std::lock_guard<std::mutex> lock{_mutex};
-	return ::write(_fd, std::forward<Buffer>(buf), size);
-}
-
-/**
- * Cette fonction est bloquante tant qu'il n'y a pas de données à lire.
- * @param buf  : le buffer contenant les données lues.
- * @param size : le nombre d'octets à lire.
- * @return le nombre d'octets lues ou -1 si une erreur s'est produite.
- */
-template <typename Buffer>
-inline int net::Client::read(Buffer && buf, std::size_t size) const {
-    return ::read(_fd, std::forward<Buffer>(buf), size);
-}
 
 /**
  * Cette fonction est bloquante tant que le délimiteur n'a pas été atteint.
@@ -100,7 +77,7 @@ inline int net::Client::readUntil(Buffer && buf, std::size_t size, char d) const
 	std::string::size_type pos = data.find(d);
 	while(pos == std::string::npos) {
 		char innerBuf[BUFSIZ];
-		int rdlen = ::read(_fd, innerBuf, BUFSIZ);
+		int rdlen = read(innerBuf, BUFSIZ);
 		if(rdlen <= 0)	return rdlen;
 		innerBuf[rdlen] = 0;
 		data += innerBuf;

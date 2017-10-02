@@ -22,7 +22,8 @@ static void sigpipe(int) {}
 #define ERROR_IF(FUNCTION) \
     if (FUNCTION) { perror(#FUNCTION); exit(errno); }
 
-net::Server::Server(int port):
+net::Server::Server(int port, long timeout):
+	_timeout{timeout},
 	_port(port),
 	_threadAccept{false, std::thread{}} {
 	signal(SIGPIPE, &sigpipe);
@@ -82,7 +83,7 @@ net::Client const & net::Server::accept()
 		}
 
     _clientListMutex.lock();
-	auto clientPair = _clients.insert(Client(newfd));
+	auto clientPair = _clients.insert(Client(newfd, _timeout));
     _clientListMutex.unlock();
 	
 	if (!clientPair.second)

@@ -25,6 +25,7 @@ struct Server
 	typedef std::set<Client> Clients;
 
 private:
+	long const _timeout;
     int		   _port;		// port de connexion
     int		   _fd;		// socket
     Clients	   _clients;	// Ensemble des clients connectés
@@ -33,7 +34,7 @@ private:
 
 public:
 	/** @brief Constructeur */
-	Server(int port);
+	Server(int port, long timeout);
 
 	/** @brief Destructeur */
 	~Server();
