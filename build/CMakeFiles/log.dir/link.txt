@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblog.a  CMakeFiles/log.dir/lib/log/logentry.cpp.o CMakeFiles/log.dir/lib/log/logger.cpp.o
-/usr/bin/ranlib liblog.a

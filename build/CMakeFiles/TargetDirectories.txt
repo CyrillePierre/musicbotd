@@ -1,8 +1,0 @@
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/rebuild_cache.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/edit_cache.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/headers.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/test_log.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/log.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/net.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/musicbotd.dir
-/home/cyrille/projects/software/musicbot/musicbotd/build/CMakeFiles/test_any.dir
