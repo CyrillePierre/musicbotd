@@ -231,7 +231,7 @@ std::string CmdParser::move(std::istream & iss) {
 	double incTime;
 	if (iss >> incTime) {
 		_player.move(incTime);
-		return "";
+		return progress(iss);
 	}
 	return "Failed: Parse error\n";
 }

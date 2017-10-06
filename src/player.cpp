@@ -262,7 +262,7 @@ void Player::move(double seconds) {
 	if (!_isPlaying) return;
 	double newTime = timePos() + seconds;
 	checkError(&mpv_set_property_async, _mpv, PlayerEvt::timePosChanged, 
-			"time-pos", MPV_FORMAT_DOUBLE, &seconds);
+			"time-pos", MPV_FORMAT_DOUBLE, &newTime);
     _lg(elog::dbg) << "time = " << newTime << " s";
 }
 
