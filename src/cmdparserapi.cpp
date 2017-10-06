@@ -278,7 +278,7 @@ std::string CmdParserAPI::move(std::istream & iss) {
 
 	if (iss >> incTime) {
 		_player.move(incTime);
-		json["event"] = Event::TimePosChanged;
+		json["event"] = Event::TimePos;
 		json["value"] = "";
 		return json.dump() + "\n";
 	}

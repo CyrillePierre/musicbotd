@@ -6,7 +6,7 @@ class CmdParserAPI: public CmdParserBase<CmdParserAPI> {
 public:
 	enum Event: int {
 		Search = -7, Unsubscribe = -6, Subscribe = -5, Current = -3, Progress = -2, List = -1,
-		Volume = 3, State = 4, TimePosChanged = 5,
+		Add = 0, Remove = 1, CurrentChanged = 2, Volume = 3, State = 4, Clear = 5, TimePos = 5,
 		PlayListEnter = 10, PlayListCurrent = 11, PlayListList = 12, PlayListQuit = 19,
 	};
 	
