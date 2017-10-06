@@ -22,6 +22,7 @@ enum PlayerEvt {
     volumeChanged,
     paused,
     cleared,
+	timePosChanged,
 };
 
 /**
@@ -87,6 +88,7 @@ public:
     double duration();
     double timePos();
     WebMusic current();
+	void move(double seconds);
 
 	bool subscribe(Subscriber const&subscriber);
 	bool unsubscribe(Subscriber const&subscriber);
@@ -100,7 +102,7 @@ private:
     void asyncPlayNext();
     void sendEvent(PlayerEvt pe, util::Any && any = util::Any{});
 
-		void processSubscriptions(std::size_t n);
+	void processSubscriptions(std::size_t n);
 
     template <class... Args, class... Prms>
     void checkError(int (*fn)(Args...), Prms &&... args) const;

@@ -6,8 +6,8 @@ class CmdParserAPI: public CmdParserBase<CmdParserAPI> {
 public:
 	enum Event: int {
 		Search = -7, Unsubscribe = -6, Subscribe = -5, Current = -3, Progress = -2, List = -1,
-		Volume = 3, State = 4,
-		PlayListEnter = 10, PlayListCurrent = 11, PlayListList = 12, PlayListQuit = 19
+		Volume = 3, State = 4, TimePosChanged = 5,
+		PlayListEnter = 10, PlayListCurrent = 11, PlayListList = 12, PlayListQuit = 19,
 	};
 	
 public:
@@ -36,6 +36,7 @@ private:
 	std::string subscribe(std::istream & iss);
 	std::string unsubscribe(std::istream & iss);
 	std::string volume(std::istream & iss);
+	std::string move(std::istream & iss);
 
 	friend CmdParserBase<CmdParserAPI>;
 };

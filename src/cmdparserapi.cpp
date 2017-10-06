@@ -271,3 +271,16 @@ std::string CmdParserAPI::volume(std::istream & iss) {
 		json["value"] = _player.volume();
 	return json.dump() + "\n";
 }
+
+std::string CmdParserAPI::move(std::istream & iss) {
+	nlohmann::json json;
+	double incTime;
+
+	if (iss >> incTime) {
+		_player.move(incTime);
+		json["event"] = Event::TimePosChanged;
+		json["value"] = "";
+		return json.dump() + "\n";
+	}
+	return error("Failed to parse parameter") + "\n";
+}

@@ -257,6 +257,15 @@ WebMusic Player::current() {
     return WebMusic{id.substr(id.size() - cfg::ytIdSize), title};
 }
 
+void Player::move(double seconds) {
+    _lg(elog::trace) << "move(" << seconds << ')';
+	if (!_isPlaying) return;
+	double newTime = timePos() + seconds;
+	checkError(&mpv_set_property_async, _mpv, PlayerEvt::timePosChanged, 
+			"time-pos", MPV_FORMAT_DOUBLE, &newTime);
+    _lg(elog::dbg) << "time = " << newTime << " s";
+}
+
 bool Player::subscribe(Subscriber const&subscriber) {
 	{
 		Lock innerLock{_subscribersMutex};
