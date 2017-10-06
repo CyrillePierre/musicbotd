@@ -65,6 +65,7 @@ public:
 		if (cmd == "subscribe")	  return _this->subscribe(iss);
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
 		if (cmd == "volume")      return _this->volume(iss);
+		if (cmd == "move")        return _this->move(iss);
 		if (_auth) {
 			if (cmd == "time") {
 				std::time_t t = std::time(nullptr);
@@ -104,6 +105,7 @@ private:
  subscribe         Subscribe to automatically insert musics
  unsubscribe       Unsubscribe to automatically insert musics
  vol <value>       Increment the volume with the corresponding <value> (in %).
+ move <value>      Jump <value> seconds in time
  ----------------- Require authentification:
  time              Announce time (fr)
  tts lang text     Text-to-Speech

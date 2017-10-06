@@ -57,7 +57,7 @@ int main() try {
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 
-	elog::cfg().logLevel(elog::dbg);
+	elog::cfg().logLevel(elog::trace);
 	elog::cfg().timeEnabled(true);
 	elog::Logger l;
 

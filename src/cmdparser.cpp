@@ -226,3 +226,12 @@ std::string CmdParser::volume(std::istream & iss) {
 	}
 	return "Volume = " + std::to_string(_player.volume()) + "\n";
 }
+
+std::string CmdParser::move(std::istream & iss) {
+	double incTime;
+	if (iss >> incTime) {
+		_player.move(incTime);
+		return "";
+	}
+	return "Failed: Parse error\n";
+}
