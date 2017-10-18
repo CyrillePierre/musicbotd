@@ -102,6 +102,11 @@ std::string CmdParserAPI::pause(std::istream &) {
 	return "";
 }
 
+std::string CmdParserAPI::play(std::istream &) {
+	_player.setPause(false);
+	return "";
+}
+
 std::string CmdParserAPI::pl(std::istream & iss) {
 	std::string fn;
 	iss >> fn;

@@ -77,6 +77,7 @@ public:
     void next();
     void togglePause();
     bool isPaused() const { return _pause; }
+	void setPause(bool enable);
     bool isStarted() const { return _started; }
     Volume incrVolume(Volume v);
     Volume volume() const;

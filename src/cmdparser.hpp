@@ -16,6 +16,7 @@ private:
 	std::string list(std::istream & iss);
 	std::string next(std::istream & iss);
 	std::string pause(std::istream & iss);
+	std::string play(std::istream & iss);
 	std::string pl(std::istream & iss);
 	std::string plcur(std::istream & iss);
 	std::string pllist(std::istream & iss);

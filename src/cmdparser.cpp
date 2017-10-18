@@ -88,6 +88,11 @@ std::string CmdParser::pause(std::istream &) {
 	return "";
 }
 
+std::string CmdParser::play(std::istream &) {
+	_player.setPause(false);
+	return "";
+}
+
 std::string CmdParser::pl(std::istream & iss) {
 	std::string fn;
 	iss >> fn;
