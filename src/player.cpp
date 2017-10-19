@@ -177,17 +177,28 @@ void Player::togglePause() {
     checkError(&mpv_set_property_async, _mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState);
     _lg << "pause state = " << pauseState;
     _pause = pauseState;
+	sendEvent(PlayerEvt::paused, _pause);
+}
+
+void Player::setPause(bool enable) {
+    _lg(elog::trace) << "setPause(" << enable << ")";
+	if (_pause != enable) {
+		int pauseState = enable;
+		checkError(&mpv_set_property_async, _mpv, PlayerEvt::paused, "pause", MPV_FORMAT_FLAG, &pauseState);
+		_lg << "pause state = " << pauseState;
+		_pause = pauseState;
 		sendEvent(PlayerEvt::paused, _pause);
+	}
 }
 
 Player::Volume Player::incrVolume(Player::Volume v) {
     _lg(elog::trace) << "incrVolume(" << v << ')';
     Player::Volume vol = volume();
     vol += v;
-		if(vol < 0)   vol = 0;
-		if(vol > 150) vol = 150;
+	if(vol < 0)   vol = 0;
+	if(vol > 150) vol = 150;
     checkError(&mpv_set_property_async, _mpv, PlayerEvt::volumeChanged, "volume", MPV_FORMAT_DOUBLE, &vol);
-		sendEvent(PlayerEvt::volumeChanged, vol);
+	sendEvent(PlayerEvt::volumeChanged, vol);
     return vol;
 }
 

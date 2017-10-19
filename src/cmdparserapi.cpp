@@ -97,8 +97,19 @@ std::string CmdParserAPI::next(std::istream &) {
 	return "";
 }
 
-std::string CmdParserAPI::pause(std::istream &) {
+std::string CmdParserAPI::pause(std::istream & iss) {
+	bool value;
+	if (iss >> value) {
+		_player.setPause(value);
+		return "";
+	}
+
 	_player.togglePause();
+	return "";
+}
+
+std::string CmdParserAPI::play(std::istream &) {
+	_player.setPause(false);
 	return "";
 }
 

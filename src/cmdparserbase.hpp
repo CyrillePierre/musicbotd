@@ -52,6 +52,7 @@ public:
 		if (cmd == "list")        return _this->list(iss);
 		if (cmd == "next")        return _this->next(iss);
 		if (cmd == "pause")       return _this->pause(iss);
+		if (cmd == "play")        return _this->play(iss);
 		if (cmd == "pl")          return _this->pl(iss);
 		if (cmd == "plcur")       return _this->plcur(iss);
 		if (cmd == "pllist")      return _this->pllist(iss);
@@ -92,7 +93,8 @@ private:
  current           Show the current video name.
  list [<N>]        List the <N> next videos (all videos if <N> is omitted).
  next              Pass to the next music.
- pause             Pause the current music.
+ pause [<N>]       Toggle or set the 'pause' state (<N> is a boolean)
+ play              Play when the music is paused.
  pl <name>         Enter in the playlist <name>.
  plcur             Display the current playlist.
  pllist            List all existing playlists.
