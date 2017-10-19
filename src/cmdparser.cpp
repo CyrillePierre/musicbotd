@@ -83,7 +83,13 @@ std::string CmdParser::next(std::istream &) {
 	return "";
 }
 
-std::string CmdParser::pause(std::istream &) {
+std::string CmdParser::pause(std::istream & iss) {
+	bool value;
+	if (iss >> value) {
+		_player.setPause(value);
+		return "";
+	}
+
 	_player.togglePause();
 	return "";
 }

@@ -93,7 +93,7 @@ private:
  current           Show the current video name.
  list [<N>]        List the <N> next videos (all videos if <N> is omitted).
  next              Pass to the next music.
- pause             Pause the current music.
+ pause [<N>]       Toggle or set the 'pause' state (<N> is a boolean)
  play              Play when the music is paused.
  pl <name>         Enter in the playlist <name>.
  plcur             Display the current playlist.
