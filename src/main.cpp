@@ -10,7 +10,8 @@
 #include "eventviewer.hpp"
 #include "archivemgr.hpp"
 
-#define MB_BASE_PATH	""
+#define MB_BASE_PATH	"/var/lib/musicbotd/"
+#define MB_LOGFILE    "/var/log/musicbotd.log"
 
 long const TIMEOUT = 30; // seconds
 
@@ -57,8 +58,9 @@ int main() try {
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 
-	elog::cfg().logLevel(elog::trace);
+	elog::cfg().logLevel(elog::msg);
 	elog::cfg().timeEnabled(true);
+	elog::cfg().stream(MB_LOGFILE);
 	elog::Logger l;
 
 	int port = 1937, portAPI = 1938;
