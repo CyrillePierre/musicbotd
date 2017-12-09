@@ -57,7 +57,8 @@ private:
     mpv_handle *			_mpv;
     ese::log::Logger		_lg;
     EventHandler			_evtFn;
-	Subscribers _subscribers;
+	Subscribers             _subscribers;
+	bool                    _xmas;
 
 public:
     Player(Archive & archive);
@@ -90,6 +91,8 @@ public:
     double timePos();
     WebMusic current();
 	void move(double seconds);
+	bool xmas() const { return _xmas; }
+	void xmas(bool enabled) { _xmas = enabled; }
 
 	bool subscribe(Subscriber const&subscriber);
 	bool unsubscribe(Subscriber const&subscriber);

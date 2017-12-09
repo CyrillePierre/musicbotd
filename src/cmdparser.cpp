@@ -14,6 +14,8 @@ CmdParser::CmdParser(Player & player, ArchiveMgr & archivemgr) : CmdParserBase{p
 std::string CmdParser::error(std::string const & msg) const { return msg; }
 
 std::string CmdParser::add(std::istream & iss) {
+	if (_player.xmas()) return "Disabled command";
+
 	std::string id;
 	iss >> id;
 
@@ -101,7 +103,8 @@ std::string CmdParser::play(std::istream &) {
 
 std::string CmdParser::pl(std::istream & iss) {
 	std::string fn;
-	iss >> fn;
+	if (_player.xmas()) fn = "xmas";
+	else iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive = _archivemgr.load(fn);
 	if (_archive) return "Entering playlist: "+fn+"\n";
@@ -123,12 +126,16 @@ std::string CmdParser::pllist(std::istream &) {
 }
 
 std::string CmdParser::plquit(std::istream &) {
+	if (_player.xmas()) return "Disabled command";
+
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive.reset();
 	return "Entering default playlist\n";
 }
 
 std::string CmdParser::plrm(std::istream & iss) {
+	if (_player.xmas()) return "Disabled command";
+
 	std::string id;
 	if (!(iss >> id) || id.size() != cfg::ytIdSize) {
 		_lg(elog::warn) << "Remove failed: parsing error";
@@ -166,6 +173,8 @@ std::string CmdParser::random(std::istream &) {
 }
 
 std::string CmdParser::rm(std::istream & iss) {
+	if (_player.xmas()) return "Disabled command";
+
 	std::string id;
 	if (iss >> id) {
 		char * end;

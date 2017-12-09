@@ -19,11 +19,13 @@ std::string CmdParserAPI::error(std::string const & msg) const {
 }
 
 std::string CmdParserAPI::add(std::istream & iss) {
+	if (_player.xmas()) return error("Disabled command") + "\n";
+
 	std::string id, errmsg;
 	iss >> id;
 
-	if (id.size() < cfg::ytIdSize) {
-		std::string err{"Invalid video ID : '" + id + "'"};
+if (id.size() < cfg::ytIdSize) {
+	std::string err{"Invalid video ID : '" + id + "'"};
 		_lg(elog::warn) << err;
 		errmsg = err;
 	} else {
@@ -115,7 +117,8 @@ std::string CmdParserAPI::play(std::istream &) {
 
 std::string CmdParserAPI::pl(std::istream & iss) {
 	std::string fn;
-	iss >> fn;
+	if (_player.xmas()) fn = "xmas";
+	else iss >> fn;
 	if(_archive) _archivemgr.unload(std::move(_archive));
 	_archive = _archivemgr.load(fn);
 	if (_archive) {
@@ -146,6 +149,8 @@ std::string CmdParserAPI::pllist(std::istream & iss) {
 }
 
 std::string CmdParserAPI::plquit(std::istream &) {
+	if (_player.xmas()) return error("Disabled command") + "\n";
+
 	nlohmann::json json;
 	json["event"] = Event::PlayListQuit;
 	if(_archive) _archivemgr.unload(std::move(_archive));
@@ -154,6 +159,8 @@ std::string CmdParserAPI::plquit(std::istream &) {
 }
 
 std::string CmdParserAPI::plrm(std::istream & iss) {
+	if (_player.xmas()) return error("Disabled command") + "\n";
+
 	std::string id;
 	if (!(iss >> id) || id.size() != cfg::ytIdSize) {
 		_lg(elog::warn) << "Remove failed: parsing error";
@@ -190,6 +197,8 @@ std::string CmdParserAPI::random(std::istream &) {
 }
 
 std::string CmdParserAPI::rm(std::istream & iss) {
+	if (_player.xmas()) return error("Disabled command") + "\n";
+
 	std::string id, errmsg;
 	if (iss >> id) {
 		char * end;

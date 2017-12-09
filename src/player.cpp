@@ -8,7 +8,7 @@
 namespace elog = ese::log;
 
 Player::Player(Archive & archive)
-    : _archive{archive}, _pause{false}, _started{false}, _isPlaying{false}
+    : _archive{archive}, _pause{false}, _started{false}, _isPlaying{false}, _xmas{true}
 {
     _lg.prefix("player: ");
 

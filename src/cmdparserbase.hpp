@@ -44,6 +44,11 @@ public:
 
 		iss >> cmd;
 
+		// If xmas mode is activated and the client isn't in the xmas playlist
+		// then the archive is changed to 'xmas'
+		if (_player.xmas() && (!_archive || (_archive && _archive->name() != "xmas")))
+			_this->pl(iss);
+
 		if (cmd == "add")         return _this->add(iss);
 		if (cmd == "auth")        return _this->auth(iss);
 		if (cmd == "clear")       return _this->clear(iss);
@@ -67,6 +72,7 @@ public:
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
 		if (cmd == "volume")      return _this->volume(iss);
 		if (cmd == "move")        return _this->move(iss);
+		if (cmd == "xmas_toggle") return xmas(iss);
 		if (_auth) {
 			if (cmd == "time") {
 				std::time_t t = std::time(nullptr);
@@ -134,5 +140,10 @@ private:
 		std::replace(text.begin(), text.end(), '"', '\'');
 		text = "\""+text.substr(0, 256)+"\"";
 		speak(lang, text);
+	}
+
+	std::string xmas(std::istringstream &) {
+		_player.xmas(!_player.xmas());
+		return "";
 	}
 };
