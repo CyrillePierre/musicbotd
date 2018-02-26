@@ -31,6 +31,7 @@ private:
 	std::string unsubscribe(std::istream & iss);
 	std::string volume(std::istream & iss);
 	std::string move(std::istream & iss);
+	std::string norm(std::istream & iss);
 
 	friend CmdParserBase<CmdParser>;
 };

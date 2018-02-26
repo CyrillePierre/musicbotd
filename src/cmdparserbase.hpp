@@ -67,6 +67,7 @@ public:
 		if (cmd == "unsubscribe") return _this->unsubscribe(iss);
 		if (cmd == "volume")      return _this->volume(iss);
 		if (cmd == "move")        return _this->move(iss);
+		if (cmd == "norm")        return _this->norm(iss);
 		if (_auth) {
 			if (cmd == "time") {
 				std::time_t t = std::time(nullptr);
@@ -108,6 +109,7 @@ private:
  unsubscribe       Unsubscribe to automatically insert musics
  vol <value>       Increment the volume with the corresponding <value> (in %).
  move <value>      Jump <value> seconds in time
+ norm (0|1)        Disable/enable dynamic audio normalization
  ----------------- Require authentification:
  time              Announce time (fr)
  tts lang text     Text-to-Speech

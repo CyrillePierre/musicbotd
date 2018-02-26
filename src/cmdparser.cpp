@@ -246,3 +246,13 @@ std::string CmdParser::move(std::istream & iss) {
 	}
 	return "Failed: Parse error\n";
 }
+
+std::string CmdParser::norm(std::istream & iss) {
+	bool enable;
+
+	if (iss >> enable) {
+		_player.normalize(enable);
+		return "";
+	}
+	return "Failed: Parse error\n";
+}
