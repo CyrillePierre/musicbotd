@@ -295,3 +295,16 @@ std::string CmdParserAPI::move(std::istream & iss) {
 	}
 	return error("Failed to parse parameter") + "\n";
 }
+
+std::string CmdParserAPI::norm(std::istream & iss) {
+	nlohmann::json json;
+	bool enable;
+
+	if (iss >> enable) {
+		_player.normalize(enable);
+		json["event"] = Event::Normalize;
+		json["value"] = enable;
+		return json.dump() + "\n";
+	}
+	return error("Failed to parse parameter") + "\n";
+}

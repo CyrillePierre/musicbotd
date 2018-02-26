@@ -23,6 +23,7 @@ enum PlayerEvt {
     paused,
     cleared,
 	timePosChanged,
+	filterChanged,
 };
 
 /**
@@ -90,6 +91,7 @@ public:
     double timePos();
     WebMusic current();
 	void move(double seconds);
+	void normalize(bool enable);
 
 	bool subscribe(Subscriber const&subscriber);
 	bool unsubscribe(Subscriber const&subscriber);

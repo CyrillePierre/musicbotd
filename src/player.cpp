@@ -277,6 +277,21 @@ void Player::move(double seconds) {
     _lg(elog::dbg) << "time = " << newTime << " s";
 }
 
+void Player::normalize(bool enable) {
+    _lg(elog::trace) << "normalize(" << enable << ')';
+	if (enable) {
+		char const * filter = "lavfi=[dynaudnorm=f=100:p=0.6]";
+		checkError(&mpv_set_property_async, _mpv, PlayerEvt::filterChanged, 
+				"af", MPV_FORMAT_STRING, &filter);
+	}
+	else {
+		char const * filter = "";
+		checkError(&mpv_set_property_async, _mpv, PlayerEvt::filterChanged, 
+				"af", MPV_FORMAT_STRING, &filter);
+	}
+    _lg(elog::dbg) << "normalization filter state = " << enable;
+}
+
 bool Player::subscribe(Subscriber const&subscriber) {
 	{
 		Lock innerLock{_subscribersMutex};

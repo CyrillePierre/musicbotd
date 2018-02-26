@@ -75,12 +75,12 @@ net::Client const & net::Server::accept()
     socklen_t       clientlen = sizeof(client);
     int             newfd;
  
-		newfd = ::accept(_fd, &client, &clientlen);
-		if(newfd == -1) {
-			if(errno == EAGAIN || errno == EWOULDBLOCK) throw std::runtime_error{"error: would block"};
-			perror("newfd == -1");
-			exit(errno);
-		}
+	newfd = ::accept(_fd, &client, &clientlen);
+	if(newfd == -1) {
+		if(errno == EAGAIN || errno == EWOULDBLOCK) throw std::runtime_error{"error: would block"};
+		perror("newfd == -1");
+		exit(errno);
+	}
 
     _clientListMutex.lock();
 	auto clientPair = _clients.insert(Client(newfd, _timeout));
