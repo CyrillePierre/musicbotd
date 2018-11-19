@@ -22,10 +22,10 @@ void applyFunction(Player & player, ArchiveMgr & archivemgr, net::Client const &
 	lg.prefix(std::string{"client "} + std::to_string(client.id()) + ": ");
 	lg << "connected";
 
-	char buf[128];
+	std::string buf;
 	Parser parser{player, archivemgr};
 
-	while (std::size_t nbRead = client.readUntil(buf, 128, '\n')) {
+	while (std::size_t nbRead = client.readUntil(buf, '\n')) {
 		try {
 			buf[nbRead] = 0;
 			std::string line(buf);

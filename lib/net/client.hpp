@@ -17,6 +17,7 @@ namespace net {
 class Client {
 	long const _timeout;
 	int _fd;	// Le file descriptor de la socket
+	mutable std::string _data;
     mutable std::mutex _mutex;
 
 public:
@@ -43,8 +44,7 @@ public:
 	int read(void * buf, std::size_t size) const;
 
 	/** @brief Réception de données du client jusqu'à un délimiteur. */
-	template <typename Buffer>
-	int readUntil(Buffer && buf, std::size_t size, char d) const;
+	int readUntil(std::string & buf, char d) const;
 
     int id() const { return _fd; }
 };
@@ -63,31 +63,5 @@ inline void net::Client::asyncRun(Callable && callable) const {
 	std::thread(std::forward<Callable>(callable), std::cref(*this)).detach();
 }
 
-
-/**
- * Cette fonction est bloquante tant que le délimiteur n'a pas été atteint.
- * @param buf  : le buffer contenant les données lues.
- * @param size : le nombre maximal d'octets à lire.
- * @param d    : le délimiteur
- * @return le nombre d'octets lus ou -1 si une erreur s'est produite.
- */
-template <typename Buffer>
-inline int net::Client::readUntil(Buffer && buf, std::size_t size, char d) const {
-	static std::string data;
-	std::string::size_type pos = data.find(d);
-	while(pos == std::string::npos) {
-		char innerBuf[BUFSIZ];
-		int rdlen = read(innerBuf, BUFSIZ);
-		if(rdlen <= 0)	return rdlen;
-		innerBuf[rdlen] = 0;
-		data += innerBuf;
-		pos = data.find(d);
-	}
-
-	std::size_t len = std::min(size, pos);
-	std::copy(data.begin(), data.begin()+len, std::forward<Buffer>(buf));
-	data.erase(0, pos+1);
-	return len;
-}
 
 #endif
