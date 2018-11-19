@@ -29,3 +29,25 @@ int net::Client::read(void * buf, std::size_t size) const {
 	if (res) return ::read(_fd, buf, size);
     return 0;
 }
+
+/**
+ * Cette fonction est bloquante tant que le délimiteur n'a pas été atteint.
+ * @param buf  : le buffer contenant les données lues.
+ * @param size : le nombre maximal d'octets à lire.
+ * @param d    : le délimiteur
+ * @return le nombre d'octets lus ou -1 si une erreur s'est produite.
+ */
+int net::Client::readUntil(std::string & buf, char d) const {
+	std::string::size_type pos = _data.find(d);
+	while(pos == std::string::npos) {
+		char innerBuf[BUFSIZ];
+		int rdlen = ::read(_fd, innerBuf, BUFSIZ);
+		if(rdlen <= 0)	return rdlen;
+		_data.append(innerBuf, rdlen);
+		pos = _data.find(d);
+	}
+
+	buf = _data.substr(0, pos);
+	_data.erase(0, pos+1);
+	return pos+1;
+}
