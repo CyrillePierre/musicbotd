@@ -190,7 +190,7 @@ std::string CmdParser::search(std::istream & is) {
 
 	std::vector<WebMusic> list;
 	if(_archive && !_archive->empty())	list = _archive->search(search);
-	else																list = _player.archive().search(search);
+	else list = _player.archive().search(search);
 
 	std::ostringstream oss;
 	oss << "Matched musics: \n";
@@ -255,4 +255,15 @@ std::string CmdParser::norm(std::istream & iss) {
 		return "";
 	}
 	return "Failed: Parse error\n";
+}
+
+std::string CmdParser::addn(std::istream &iss) {
+  std::istringstream result{search(iss)};
+  std::string id;
+
+  result >> id;
+  result >> id;
+  result >> id;
+  
+  return add(result);
 }

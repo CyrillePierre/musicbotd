@@ -20,6 +20,7 @@ public:
 		Clear          = 5, 
 		TimePos        = 6,
 		Normalize      = 7,
+		Addn           = 8,
 
 		PlayListEnter   = 10, 
 		PlayListCurrent = 11, 
@@ -56,6 +57,7 @@ private:
 	std::string volume(std::istream & iss);
 	std::string move(std::istream & iss);
 	std::string norm(std::istream & iss);
+        std::string addn(std::istream & iss);
 
 	friend CmdParserBase<CmdParserAPI>;
 };

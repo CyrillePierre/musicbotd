@@ -308,3 +308,14 @@ std::string CmdParserAPI::norm(std::istream & iss) {
 	}
 	return error("Failed to parse parameter") + "\n";
 }
+
+std::string CmdParserAPI::addn(std::istream &iss) {
+  std::string result = search(iss);
+  nlohmann::json json = nlohmann::json::parse(result);
+  nlohmann::json array = json["value"];
+
+  std::string id = array[0]["id"];
+  std::istringstream issou(id);
+  
+  return add(issou);
+}

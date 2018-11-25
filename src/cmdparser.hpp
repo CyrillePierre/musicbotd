@@ -32,6 +32,7 @@ private:
 	std::string volume(std::istream & iss);
 	std::string move(std::istream & iss);
 	std::string norm(std::istream & iss);
+        std::string addn(std::istream & iss);
 
 	friend CmdParserBase<CmdParser>;
 };

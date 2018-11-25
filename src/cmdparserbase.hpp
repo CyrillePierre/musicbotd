@@ -68,6 +68,7 @@ public:
 		if (cmd == "volume")      return _this->volume(iss);
 		if (cmd == "move")        return _this->move(iss);
 		if (cmd == "norm")        return _this->norm(iss);
+		if (cmd == "addn")        return _this->addn(iss);
 		if (_auth) {
 			if (cmd == "time") {
 				std::time_t t = std::time(nullptr);
