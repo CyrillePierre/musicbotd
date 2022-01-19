@@ -21,6 +21,9 @@ Player::Player(Archive & archive)
 	int status;
     int opt = 1;
 
+	char const * cmd  = "ytdl_hook-ytdl_path=yt-dlp";
+	checkError(&mpv_set_property, _mpv, "script-opts", MPV_FORMAT_STRING, &cmd);
+
 	_lg(elog::dbg) << "Set ytdl property";
     if ((status = mpv_set_property(_mpv, "ytdl", MPV_FORMAT_FLAG, &opt)) < 0)
         _lg(elog::err) << "failed: " << mpv_error_string(status);
