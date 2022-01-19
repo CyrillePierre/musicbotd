@@ -11,7 +11,6 @@ endif()
 set(CMAKE_MODULE_PATH cmake)
 set(CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib/x86_64-linux-gnu/)
 find_package(CURL REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem system)
 
 # lib log
 file(GLOB_RECURSE log_sources lib/log/*.cpp)

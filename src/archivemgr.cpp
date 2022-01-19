@@ -1,5 +1,6 @@
+#include <algorithm>
+#include <filesystem>
 #include "archivemgr.hpp"
-#include <boost/filesystem.hpp>
 
 ArchiveMgr::ArchivePtr ArchiveMgr::load(std::string const & fn) {
 	if (fn.find('/') != std::string::npos) return ArchivePtr{};
@@ -35,7 +36,7 @@ void ArchiveMgr::unload(ArchivePtr && ptr) {
 }
 
 ArchiveMgr::Playlists ArchiveMgr::list() {
-    using namespace boost::filesystem;
+    using namespace std::filesystem;
     path workdir{_wd};
     Playlists pls;
     for (directory_iterator it{workdir}; it != directory_iterator{}; ++it) {
