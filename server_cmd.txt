@@ -1,6 +1,5 @@
 This file describe features of the TCP daemon : musicbotd
 Server default port : 1937 (randomly choose by Pierre Guinault)
-
 Description of TCP commands of musicbot server.
 
 	add (<id>|<url>)

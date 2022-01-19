@@ -118,8 +118,10 @@ private:
 	}
 
 	void speak(std::string lang, std::string text) {
+		ese::log::Logger l;
 		bool mustPause = !_player.isPaused();
 		if(mustPause) _player.togglePause();
+		l << "text: " << text;
 
 		int pid;
 		if((pid = fork()) == 0) {
